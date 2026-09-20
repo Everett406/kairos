@@ -1,130 +1,121 @@
-# Kairos · 液态玻璃桌面助手
+<div align="center">
 
-> 一个常驻 Windows 桌面的悬浮助手。天气、音乐、硬件监控、剪贴板、番茄钟、翻译以卡片网格排布，
-> 点开任意卡片即以 GSAP FLIP 动画全屏展开；界面背景由一层**自研 WebGL 着色器做真实折射**的液态玻璃绘制。
+# Kairos
 
+**常驻 Windows 桌面的玻璃质感小组件面板**
+
+*Kairos（καιρός），希腊语里「恰逢其时的那一刻」。*
+
+六张卡片卧在一张无边框玻璃面板上——天气、系统监控、番茄钟、音乐、剪贴板、翻译。
+点开任意一张，以一段流畅的 FLIP 动效全屏展开。不注册、不上云，数据都留在你自己的电脑里。
+
+[![Release](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2FEverett406%2Fkairos%2Freleases&query=%24[0].tag_name&label=release&color=3b6ef5)](https://github.com/Everett406/kairos/releases)
 ![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-0078D6?style=flat-square&logo=windows11&logoColor=white)
-![Electron](https://img.shields.io/badge/Electron-44-47848F?style=flat-square&logo=electron&logoColor=white)
+![Tauri](https://img.shields.io/badge/Tauri-2-24C8D8?style=flat-square&logo=tauri&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white)
 
-Kairos 分成两部分：React 前端负责全部界面与动画，Electron 主进程负责窗口、权限以及硬件与网络
-数据采集。前端通过 `src/lib/tauri.ts` 这层薄桥与后端通信，桥的方法签名与原生 Tauri 保持一致，
-所以纯浏览器预览和桌面运行可以共用同一套面板代码。
+[下载安装](#安装) · [功能总览](#功能总览) · [常见问题](#常见问题-faq) · [参与开发](#开发)
 
-## 功能模块
+<br>
 
-| 模块 | 说明 |
-|---|---|
-| 天气 | 自动定位，实时温度 / 多日预报 / 空气质量 |
-| 音乐 | 正在播放控制、歌词滚动、QQ 音乐搜索与播放 |
-| 系统监控 | 1s 实时刷新。按 **CPU / 内存 / 磁盘 / 显卡 / 网络** 拆成五张卡片，卡头显示 CPU 型号、内存规格（如 `DDR5-5600 · 2×16GB`）、显卡短名；占用率用水箱水位与 270° 仪表盘指针呈现 |
-| 剪贴板 | 历史记录与快速回填 |
-| 番茄钟 | 可配置时长（1–180 分钟，预设 15/25/45/60），暂停与中止需填写原因，每轮结束记录成条（最多 50 条）并发送桌面通知 |
-| 翻译 | 文本翻译 |
+![Kairos 主面板](docs/screenshots/01-home.png)
 
-### 系统监控的数据粒度
+</div>
 
-- **CPU**：占用率、频率、温度、风扇转速
-- **内存**：用量、频率
-- **磁盘**：按物理盘分组——父级给出容量合计 / 忙碌% / 温度，子级展开为该盘下各分区卷的用量，呈现为 `物理盘 → 分区` 两级水位
-- **显卡**：占用率、温度、风扇、显存、核心与显存频率（nvidia-smi 常驻轮询）
-- **网络**：上下行速率，仪表量程按本次会话峰值自动升档
+## 为什么是 Kairos
 
-## 液态玻璃是怎么做的
+- **六合一，一眼即得** —— 天气 / 系统监控 / 番茄钟 / 音乐 / 剪贴板 / 翻译，桌面常驻、随手可查，点开即全屏展开。
+- **轻若无物** —— Tauri 2 + Rust 原生外壳，安装包仅 7.5 MB；还有解压即用的便携版，免安装。
+- **Aurora Glass 视觉** —— 深空底色、三团氛围光、噪点质感；渐变玻璃卡片配顶部内高光，六个模块各有专属主题色，悬停即亮。
+- **动效讲究** —— GSAP FLIP 驱动的卡片展开 / 收起，从网格到全屏一气呵成，不闪不跳。
+- **真·硬件监控** —— 管理员模式下经 LibreHardwareMonitor 读取 CPU / GPU 温度、风扇转速与磁盘忙碌度。
+- **数据不出本机** —— 没有账号体系，偏好、历史与凭据全部只存在本地。
 
-Chromium 里没有任何 CSS 手段能弯折背景——`backdrop-filter` 只会模糊，SVG 滤镜式的
-"真折射"在 Chromium 上不可用。所以这一层是真的写着色器逐像素算出来的，实现见
-[`src/lib/desktopGlass.ts`](src/lib/desktopGlass.ts)：
+## 功能总览
 
-1. 先建立壁纸到屏幕的 `cover` 映射，再叠加窗口在屏幕上的偏移，使**窗口内看到的背景与桌面上
-   同一位置的壁纸对齐**；窗口移动或缩放时通过 IPC 重算映射。
-2. 再对每个 `.module-card` 的圆角矩形跑玻璃着色器：
+| 模块 | 能做什么 | 主题色 |
+| --- | --- | --- |
+| ☁️ 天气 | Open-Meteo 预报（当前 / 24h 降水 / 15 日）、中国 AQI（HJ 633-2012）、城市搜索与 IP 自动定位、日出日落、穿衣建议、降雨 / 紫外线 / 降温预警通知，30 分钟自动刷新 | 天蓝 |
+| 🖥️ 系统 | CPU / 内存 / GPU / 网速实时监控（2s 轮询）、磁盘分组容量与忙碌度；管理员模式经 LibreHardwareMonitor（WMI 桥）读取温度、风扇、内存规格 | 翠绿 |
+| 🍅 番茄钟 | 专注 / 短休 / 长休三模式、时长自定义、环形进度、完成通知、每日统计（数据存本地） | 珊瑚 |
+| 🎵 音乐 | QQ 音乐搜索、播放（免费 128k，贴 cookie 登录后可播 VIP）、同步歌词高亮（QQ LRC → LRCLIB 两级来源）、全局播放条（面板切换不断播） | 绛紫 |
+| 📋 剪贴板 | 后台监听历史（去重置顶、上限 100 条）、点击回填复制、单条删除与清空 | 琥珀 |
+| 🌐 翻译 | Google 免费端点、8 种目标语言、防抖自动翻译、检测语言与目标一致时自动反向 | 青碧 |
 
-   | 效果 | 做法 |
-   |---|---|
-   | 倒角折射 | 对圆角矩形 SDF 求梯度得到边缘法线，采样点沿法线向内推，越靠边缘越强 |
-   | 色散 | R / B 通道沿法线朝相反方向错开采样 |
-   | 镜面高光 | 高光跟随鼠标，另加一道固定顶光 |
-   | 面板色调 | 从 CSS 变量 `--glass-tint` / `--glass-tint-alpha` 读取，方便调参 |
-   | 面板外投影 | 只在 SDF 之外输出压暗的 alpha，避免整屏四边形互相覆盖 |
+## 界面一览
 
-3. 接管成功后给 `<body>` 加上 `glass-live`，CSS 随即把卡片的背景 / 边框 / 模糊让位给这一层。
+| 天气 · 展开态 | 系统监控 · 展开态 | 番茄钟 |
+| --- | --- | --- |
+| ![天气](docs/screenshots/02-weather.png) | ![系统](docs/screenshots/03-monitor.png) | ![番茄钟](docs/screenshots/04-pomodoro.png) |
 
-**降级路径**：拿不到 WebGL 上下文或壁纸加载失败时 `startDesktopGlass()` 会抛错，`App.tsx`
-捕获后保持原样，界面自动退回纯 CSS 玻璃，功能不受影响。
+| 音乐 | 剪贴板 | 翻译 |
+| --- | --- | --- |
+| ![音乐](docs/screenshots/05-music.png) | ![剪贴板](docs/screenshots/06-clipboard.png) | ![翻译](docs/screenshots/07-translate.png) |
 
-## 技术栈
+## 安装
 
-- **前端**：React 19 + TypeScript + Vite，GSAP（FLIP 展开动画、3D 卡片悬停视差）
-- **桌面壳**：Electron。无边框窗口，且 `transparent: false`——玻璃效果完全由页面内的 WebGL 层
-  绘制，不依赖 DWM 亚克力；`backgroundThrottling: false` 让窗口在后台时番茄钟与轮询照常运行
-- **硬件数据**：systeminformation + LibreHardwareMonitor（WMI 流）+ Lenovo GameZone WMI
-  （拯救者 EC 风扇）+ nvidia-smi + PowerShell 性能计数器
-- **`src-tauri/`** 保留了同一套前端的 Tauri 版本，可平滑切换
+到 [Releases](https://github.com/Everett406/kairos/releases) 下载对应产物：
 
-## 快速开始
+| 产物 | 适合谁 | 用法 |
+| --- | --- | --- |
+| `Kairos_x.y.z_x64-setup.exe` | 大多数用户 | 双击安装，开始菜单启动 |
+| `Kairos_x.y.z_x64-portable.zip` | 免安装党 | 解压即用；保持 `Kairos.exe` 与 `resources/` 目录同层 |
 
-需要 Node.js 20.19+（本项目在 Node 24 上开发）。
+> 首次运行若遇 SmartScreen 提示：安装包未做代码签名，点「更多信息 → 仍要运行」即可。
+
+## 使用与权限
+
+- **默认运行**：天气 / 音乐 / 剪贴板 / 翻译 / 番茄钟全部可用；系统模块显示占用但无温度。
+- **管理员模式**：系统卡片内一键 UAC 提权重启，解锁温度 / 风扇 / 磁盘忙碌度（安装包随附 LibreHardwareMonitor，首次提权自动拉起）。
+- **音乐 VIP**：展开音乐卡片 → 登录 → 粘贴 y.qq.com 完整 cookie（含 `uin` 与 `qm_keyst`）。凭据仅保存在本机应用数据目录。
+
+## 常见问题 FAQ
+
+**Q：系统卡片里看不到温度 / 风扇转速？**
+Windows 把传感器接口锁在管理员权限后面。在系统卡片内点「启用」，走一次 UAC 提权重启即可解锁温度、风扇与磁盘忙碌度。
+
+**Q：安装时被 SmartScreen 拦截？**
+安装包目前未做代码签名，属于正常现象：点「更多信息 → 仍要运行」。
+
+**Q：VIP 歌曲放不了？**
+免费曲目（128k）无需登录可直接播放；VIP 曲目需要你粘贴自己 y.qq.com 的完整 cookie，凭据只存在本机应用数据目录，不会上传。
+
+**Q：便携版和安装版有什么区别？**
+功能完全一致。便携版解压即用、不写注册表，唯一要注意的是别把 `Kairos.exe` 和 `resources/` 目录拆开。
+
+## 开发
 
 ```bash
-npm install
-
-# 仅浏览器 UI 预览：布局与动画可用，系统 / 天气 / 音乐等桌面数据不可用
-npm run dev
-
-# Electron 开发模式（vite 与 electron 并行）
-npm run electron:dev
-
-# 构建并启动桌面应用
-npm run start
+pnpm install
+pnpm tauri dev      # 开发调试
+pnpm tauri build    # 本地出包
+pnpm build          # 仅构建前端（Vite 产物）
 ```
 
-### 关于管理员权限
+环境要求：Node 22+、pnpm 10、Rust stable、Windows 10 1809+（WebView2 常青版）。
 
-读取风扇转速、CPU / 磁盘温度等传感器需要管理员权限。Kairos 的做法是**只在第一次弹一次 UAC**：
+| 层 | 技术 |
+| --- | --- |
+| 桌面壳 | Tauri 2（Rust），无边框窗口 + 自绘标题栏 |
+| 前端 | React 19 + TypeScript + Vite 7 |
+| 动效 | GSAP FLIP（卡片展开 / 收起） |
+| 图标 | lucide-react + Meteocons（天气） |
+| 系统信息 | sysinfo + WMI + LibreHardwareMonitor（Rust 侧） |
 
-1. 首次以普通权限启动时，注册一个名为 `Kairos\ElevatedLaunch` 的计划任务
-   （`RunLevel Highest`、无触发器、仅按需拉起），随后请求提权重启一次；
-2. 此后只要该任务已存在，启动时直接 `schtasks /run` 静默拉起提权实例、当前实例退出，
-   不再反复弹 UAC；
-3. `npm run electron:dev` 开发模式本身不提权（便于调试前端），但会为
-   LibreHardwareMonitor 单独请求一次 UAC。
+前端与 Rust 之间只通过 **16 个显式命令**与 **1 个事件**（`clipboard-changed`）通信，全部经由 `src/lib/bridge.ts` 单点收发；`bridge.ts` 内置浏览器 mock 层，UI 可以脱离桌面壳独立渲染。设计 token、模块约定、已知坑等完整交接细节见 [HANDOFF.md](HANDOFF.md)。
 
-## 项目结构
+## 发布
 
-```
-src/
-  App.tsx             # 卡片网格主界面（模块面板 + GSAP 动画 + 折射层挂载）
-  App.css             # 全量样式，含 body.glass-live 下的让位规则
-  MusicPanel.tsx      # 音乐面板（其余面板在 modules/）
-  useNowPlaying.ts    # 当前播放（系统媒体会话）
-  modules/            # 天气 / 系统监控 / 剪贴板 / 番茄钟 / 翻译
-  lib/
-    desktopGlass.ts   # WebGL 液态玻璃折射层
-    tauri.ts          # 桌面桥 shim（Electron preload ↔ 面板）
-  assets/             # 壁纸等静态资源
-electron/
-  main.cjs            # 主进程：窗口、IPC、提权计划任务、LHM 守护
-  preload.cjs         # 上下文隔离桥（window.kairos）
-  backend/            # systemStats / weather / music / lyrics / perf
-  vendor/             # 捆绑的 LibreHardwareMonitor 便携版
-src-tauri/            # 保留的 Tauri 版本
-```
+推送 `v*` tag（如 `git tag v0.3.1 && git push origin v0.3.1`），GitHub Actions 自动完成构建，约 12 分钟后产出 NSIS 安装包与便携版 zip，并以 **Draft Release** 形式挂出；人工验收无误后手动转正式。
 
-## 硬件监控说明
+## Roadmap
 
-- 捆绑的 LibreHardwareMonitor 以 `/minimized` 启动于 `electron/vendor/LibreHardwareMonitor/`。
-  启动前会先探测 WMI 命名空间，已有传感器实例则跳过；由 Kairos 拉起的实例会在应用退出时一并结束。
-- **未安装对应数据源或权限不足时，相应传感器显示 `—`，不影响其余功能。**
-- LibreHardwareMonitor 的配置文件（`LibreHardwareMonitor.config`）**不入库**：整个文件都是 LHM
-  运行时写回的逐传感器状态与本机网卡 / 电池数据，缺失时 LHM 会在首次运行自动生成默认配置。
+- [ ] 亮色主题（token 体系已就位，补齐语义映射即可）
+- [ ] 设置页：主题切换 / 开机自启 / 刷新频率
+- [ ] 卡片布局自定义：拖拽排序、隐藏模块
+- [ ] 音乐：播放队列持久化、桌面歌词
+- [ ] 天气：预警通知细分开关
 
-## 已知限制
+## 许可
 
-- **副屏偏移**：折射层按主显示器尺寸计算壁纸映射，窗口被拖到副屏时背景采样会对不上。
-- **浏览器预览不完整**：`npm run dev` 下没有桌面桥，系统监控、天气、音乐等面板会显示占位或提示，
-  这是预期行为，完整效果需以 Electron 运行。
-- 折射层每帧都会对每张卡片调用 `getBoundingClientRect()` / `getComputedStyle()` 以获取面板几何，
-  卡片数量增长会线性抬高开销。
+个人项目，仅供学习交流。
