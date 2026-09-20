@@ -22,13 +22,31 @@ body {
   font-size: var(--k-text-md);
   line-height: 1.5;
   color: var(--k-text-primary);
+  /* 深空底 + 三团彩色氛围光：页面不再是死黑 */
   background:
-    radial-gradient(1100px 700px at 18% -12%, var(--k-bg-glow), transparent 62%),
-    radial-gradient(900px 620px at 96% 112%, var(--k-bg-glow), transparent 58%),
+    radial-gradient(1000px 720px at 10% -10%, var(--k-glow-1), transparent 62%),
+    radial-gradient(920px 640px at 104% 12%, var(--k-glow-2), transparent 58%),
+    radial-gradient(1200px 780px at 46% 118%, var(--k-glow-3), transparent 64%),
     var(--k-bg-base);
   -webkit-font-smoothing: antialiased;
   user-select: none;
   cursor: default;
+}
+
+/* 细噪点：压住渐变banding，加一层"胶片"质感 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.045'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+#root {
+  position: relative;
+  z-index: 1;
 }
 
 input,
@@ -49,6 +67,15 @@ button {
 
 /* 数字一律等宽对齐（计时 / 速率 / 表格） */
 .num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 大号展示数字：温度 / 占用率 / 计时 */
+.k-bignum {
+  font-family: var(--k-font-display);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 

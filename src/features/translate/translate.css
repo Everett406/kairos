@@ -1,64 +1,85 @@
 /* ============================================================
- * 翻译模块 · 只引用 semantic token
+ * 翻译 · 主题色 --k-mod: #2dd4bf
  * ============================================================ */
 
 .t-panel {
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--k-space-2);
-  min-height: 0;
+  gap: 10px;
+  padding: var(--k-space-3) var(--k-space-4) var(--k-space-4);
 }
 
-/* 输入区 */
+/* 输入区：玻璃凹陷 */
 .t-source {
-  flex: 1;
+  flex: 1.1;
   min-height: 0;
+  display: flex;
 }
 .t-area {
-  width: 100%;
-  height: 100%;
-  min-height: 64px;
-  resize: none;
-  font-size: var(--k-text-sm);
+  flex: 1;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: var(--k-space-3) !important;
+  font-size: var(--k-text-md);
   line-height: 1.6;
+  resize: none;
 }
 
-/* 中部：语言 + 状态 */
+/* 工具行：目标语言 + 状态 */
 .t-toolbar {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--k-space-2);
+  min-height: 26px;
 }
 .t-lang {
   display: inline-flex;
   align-items: center;
-  gap: var(--k-space-1);
+  gap: 6px;
   color: var(--k-text-muted);
 }
+.t-lang > svg {
+  color: var(--k-mod);
+}
 .t-select {
-  border: 0;
-  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--k-bg-inset-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23939aa6' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right 10px center;
+  border: 1px solid var(--k-stroke-hairline);
+  border-radius: var(--k-radius-full);
   color: var(--k-text-secondary);
+  font: inherit;
   font-size: var(--k-text-xs);
-  cursor: pointer;
+  padding: 3px 26px 3px 12px;
   outline: none;
+  cursor: pointer;
+  transition: border-color var(--k-dur-fast) var(--k-ease-standard),
+    color var(--k-dur-fast) var(--k-ease-standard);
+}
+.t-select:hover {
+  border-color: var(--k-mod-border);
+  color: var(--k-text-primary);
+}
+.t-select:focus {
+  border-color: var(--k-mod-border);
 }
 .t-select option {
-  background: var(--k-bg-elevated);
+  background: #1a1e28;
   color: var(--k-text-primary);
 }
 .t-status {
   display: inline-flex;
   align-items: center;
-  min-height: 20px;
+  gap: 6px;
 }
 .t-spin {
-  color: var(--k-text-muted);
-  animation: t-rotate 1s linear infinite;
+  animation: t-rot 0.9s linear infinite;
+  color: var(--k-mod);
 }
-@keyframes t-rotate {
+@keyframes t-rot {
   to {
     transform: rotate(360deg);
   }
@@ -67,45 +88,42 @@
 /* 结果区 */
 .t-result {
   flex: 1;
-  min-height: 64px;
+  min-height: 0;
   position: relative;
-  padding: var(--k-space-2) var(--k-space-3);
+  padding: var(--k-space-3);
   border-radius: var(--k-radius-md);
-  background: var(--k-bg-inset);
-  opacity: 0.65;
-  transition: opacity var(--k-dur-fast) var(--k-ease);
+  background: linear-gradient(150deg, var(--k-mod-soft), transparent 140%), var(--k-bg-inset-soft);
+  border: 1px solid var(--k-stroke-hairline);
+  opacity: 0.72;
+  transition: opacity var(--k-dur-base) var(--k-ease-standard),
+    border-color var(--k-dur-base) var(--k-ease-standard);
 }
 .t-result.is-on {
   opacity: 1;
+  border-color: var(--k-mod-border);
 }
 .t-text {
-  margin: 0;
-  font-size: var(--k-text-sm);
+  font-size: var(--k-text-md);
   line-height: 1.65;
   color: var(--k-text-primary);
-  white-space: pre-wrap;
-  word-break: break-word;
+  overflow-y: auto;
+  max-height: 100%;
+  user-select: text;
+  cursor: text;
 }
 .t-placeholder {
-  margin: 0;
-  font-size: var(--k-text-xs);
-  color: var(--k-text-muted);
+  font-size: var(--k-text-sm);
+  color: var(--k-text-faint);
 }
 .t-error {
-  margin: 0;
-  font-size: var(--k-text-xs);
+  font-size: var(--k-text-sm);
   color: var(--k-danger);
+  word-break: break-all;
 }
 .t-copy {
   position: absolute;
-  right: var(--k-space-2);
-  bottom: var(--k-space-2);
-}
-
-/* 紧凑态压缩留白 */
-.is-compact .t-area {
-  min-height: 48px;
-}
-.is-compact .t-result {
-  min-height: 48px;
+  right: 10px;
+  bottom: 10px;
+  height: 26px;
+  background: var(--k-bg-inset) !important;
 }

@@ -88,6 +88,7 @@ export function ModuleCard({
     <section
       ref={ref}
       className={`k-card module-card${isExpanded ? ' is-expanded' : ''}`}
+      data-mod={mod.id}
       onClick={isExpanded ? undefined : handleExpand}
     >
       <header className="module-card__head">

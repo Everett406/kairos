@@ -57,12 +57,43 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build & upload to release
+        id: build
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: v__VERSION__
           releaseName: 'Kairos v__VERSION__'
-          releaseBody: 'Windows 安装包（NSIS）。系统监控的温度 / 风扇 / 磁盘详情需以管理员身份运行。'
+          releaseBody: 'Windows 安装包（NSIS）与便携版（zip，解压即用）。系统监控的温度 / 风扇 / 磁盘详情需以管理员身份运行。'
           releaseDraft: true
           prerelease: false
+
+      # 便携版：exe + resources 目录打 zip，解压即用、免安装
+      - name: Package portable zip
+        shell: pwsh
+        run: |
+          $exe = "src-tauri/target/release/kairos.exe"
+          if (-not (Test-Path $exe)) { $exe = "src-tauri/target/x86_64-pc-windows-msvc/release/kairos.exe" }
+          if (-not (Test-Path $exe)) { throw "kairos.exe not found" }
+          $ver = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
+          $stage = "portable/Kairos"
+          New-Item -ItemType Directory -Force -Path $stage | Out-Null
+          Copy-Item $exe "$stage/Kairos.exe" -Force
+          $resDir = Join-Path (Split-Path $exe) "resources"
+          if (Test-Path $resDir) { Copy-Item $resDir "$stage/resources" -Recurse -Force }
+          Compress-Archive -Path $stage -DestinationPath "Kairos_${ver}_x64-portable.zip" -Force
+          "name=Kairos_${ver}_x64-portable.zip" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Upload portable zip to draft release
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{ steps.build.outputs.releaseUploadUrl }}
+        run: |
+          $name = (Get-Content $env:GITHUB_OUTPUT | Where-Object { $_ -like 'name=*' }) -replace '^name=', ''
+          $zip = Get-ChildItem -Filter "*portable.zip" | Select-Object -First 1
+          if (-not $zip) { throw "portable zip not found" }
+          $url = $env:UPLOAD_URL -replace '\{\?name,label\}', "?name=$name"
+          Invoke-WebRequest -Method Post -Uri $url `
+            -Headers @{ Authorization = "Bearer $env:GITHUB_TOKEN" } `
+            -ContentType "application/zip" -InFile $zip.FullName

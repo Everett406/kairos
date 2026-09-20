@@ -1,33 +1,31 @@
 /* ============================================================
- * 番茄钟模块 · 只引用 semantic token
+ * 番茄钟 · 主题色 --k-mod: #ff7e67
  * ============================================================ */
 
-/* ---------- 计时盘（compact / expanded 共用） ---------- */
+/* ---- 环形表盘 ---- */
 .p-dial {
   position: relative;
-  width: 108px;
-  height: 108px;
-  margin: 0 auto;
-  flex-shrink: 0;
+  width: 158px;
+  height: 158px;
+  flex: none;
 }
 .p-dial svg {
   width: 100%;
   height: 100%;
+  display: block;
 }
 .p-dial__track {
   fill: none;
   stroke: var(--k-bg-inset);
-  stroke-width: 6;
+  stroke-width: 5;
 }
 .p-dial__fill {
   fill: none;
-  stroke: var(--k-accent);
-  stroke-width: 6;
+  stroke: var(--k-mod);
+  stroke-width: 5;
   stroke-linecap: round;
-  transition: stroke-dashoffset 0.4s linear;
-}
-.is-running .p-dial__fill {
-  stroke: var(--k-accent-strong);
+  filter: drop-shadow(0 0 6px var(--k-mod-glow));
+  transition: stroke-dashoffset 0.3s linear;
 }
 .p-dial__inner {
   position: absolute;
@@ -39,25 +37,51 @@
   gap: 2px;
 }
 .p-dial__time {
-  font-size: var(--k-text-lg);
+  font-family: var(--k-font-display);
   font-weight: 600;
+  font-size: 30px;
+  letter-spacing: -0.02em;
   color: var(--k-text-primary);
-  letter-spacing: 0.02em;
-  line-height: 1;
 }
 .p-dial__mode {
-  font-size: var(--k-text-xs);
-  color: var(--k-text-muted);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--k-mod);
 }
 
-/* ---------- 紧凑态 ---------- */
+/* 运行中：光晕呼吸 */
+.p-dial.is-running {
+  animation: p-breathe 2.6s ease-in-out infinite;
+}
+@keyframes p-breathe {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 10px var(--k-mod-glow));
+  }
+  50% {
+    filter: drop-shadow(0 0 26px var(--k-mod-glow));
+  }
+}
+
+/* ---- 紧凑态 ---- */
 .p-compact {
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--k-space-3);
+  align-items: center;
+  padding: var(--k-space-4) var(--k-space-4) var(--k-space-4);
+}
+.p-compact .p-dial {
+  flex: 1;
+  align-self: center;
+  max-width: 168px;
+  max-height: 168px;
+  aspect-ratio: 1;
+  margin: auto 0;
 }
 .p-compact__foot {
+  flex: none;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -65,98 +89,107 @@
 .p-today {
   display: inline-flex;
   align-items: center;
-  gap: var(--k-space-1);
+  gap: 5px;
   font-size: var(--k-text-xs);
   color: var(--k-text-muted);
 }
+.p-today svg {
+  color: var(--k-mod);
+}
 .p-compact__btns {
   display: inline-flex;
-  gap: var(--k-space-1);
+  gap: 6px;
 }
 
-/* 圆形图标按钮 */
+/* 主按钮：模块色圆钮 */
 .p-icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--k-stroke-subtle);
-  border-radius: 50%;
-  background: transparent;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--k-radius-full);
   color: var(--k-text-secondary);
-  cursor: pointer;
-  transition: background var(--k-dur-fast) var(--k-ease), color var(--k-dur-fast) var(--k-ease),
-    border-color var(--k-dur-fast) var(--k-ease);
+  background: var(--k-bg-inset-soft);
+  border: 1px solid var(--k-stroke-hairline);
+  transition: background var(--k-dur-fast) var(--k-ease-standard),
+    color var(--k-dur-fast) var(--k-ease-standard), border-color var(--k-dur-fast) var(--k-ease-standard);
 }
-.p-icon-btn:hover:not(:disabled) {
-  background: var(--k-accent-soft);
-  color: var(--k-accent-text);
-  border-color: transparent;
+.p-icon-btn:hover {
+  color: var(--k-mod);
+  border-color: var(--k-mod-border);
+  background: var(--k-mod-soft);
 }
 .p-icon-btn:disabled {
   opacity: 0.4;
-  cursor: default;
+  pointer-events: none;
 }
 
-/* ---------- 展开态 ---------- */
+/* ---- 展开态 ---- */
 .p-detail {
-  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--k-space-4);
-  overflow-y: auto;
   padding-top: var(--k-space-2);
 }
 .p-detail .p-dial {
-  width: 168px;
-  height: 168px;
+  width: 190px;
+  height: 190px;
 }
 .p-detail .p-dial__time {
-  font-size: var(--k-text-3xl);
-}
-.p-detail .p-dial__mode {
-  font-size: var(--k-text-sm);
+  font-size: 38px;
 }
 
+/* 模式切换：分段胶囊 */
 .p-modes {
   display: flex;
-  gap: var(--k-space-1);
-  padding: 3px;
-  border-radius: var(--k-radius-lg);
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--k-radius-full);
   background: var(--k-bg-inset);
+  border: 1px solid var(--k-stroke-hairline);
 }
 .p-mode {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: var(--k-space-1) var(--k-space-3);
-  border: 0;
-  border-radius: var(--k-radius-md);
-  background: transparent;
+  gap: 1px;
+  padding: 7px 18px;
+  border-radius: var(--k-radius-full);
+  font-size: var(--k-text-sm);
+  font-weight: 550;
   color: var(--k-text-muted);
-  font-size: var(--k-text-xs);
-  cursor: pointer;
-  transition: background var(--k-dur-fast) var(--k-ease), color var(--k-dur-fast) var(--k-ease);
+  transition: background var(--k-dur-fast) var(--k-ease-standard),
+    color var(--k-dur-fast) var(--k-ease-standard);
 }
 .p-mode:hover {
   color: var(--k-text-secondary);
 }
 .p-mode.is-active {
-  background: var(--k-bg-card-hover);
-  color: var(--k-text-primary);
+  background: var(--k-mod-soft);
+  color: var(--k-mod);
+  box-shadow: inset 0 0 0 1px var(--k-mod-border);
 }
 .p-mode__min {
   font-size: 10px;
-  color: var(--k-text-muted);
+  color: var(--k-text-faint);
+}
+.p-mode.is-active .p-mode__min {
+  color: var(--k-mod);
+  opacity: 0.75;
 }
 
+/* 主控按钮 */
 .p-controls {
   display: flex;
   gap: var(--k-space-2);
 }
+.p-controls .k-btn {
+  min-width: 108px;
+}
 
+/* 时长调整 */
 .p-adjust {
   display: flex;
   align-items: center;
@@ -165,15 +198,15 @@
   color: var(--k-text-muted);
 }
 .p-adjust__val {
-  min-width: 52px;
+  min-width: 44px;
   text-align: center;
-  color: var(--k-text-primary);
   font-size: var(--k-text-sm);
+  font-weight: 600;
+  color: var(--k-text-primary);
 }
 
+/* 统计 */
 .p-stats {
-  margin-top: auto;
   display: flex;
   gap: var(--k-space-2);
-  padding-bottom: var(--k-space-2);
 }

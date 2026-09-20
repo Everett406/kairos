@@ -7,15 +7,19 @@ import { invoke as tauriInvoke } from '@tauri-apps/api/core'
 import { listen as tauriListen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification'
+import { mockInvoke, mockListen } from './mock'
+
+/** 是否运行在真实桌面（Tauri WebView）里；浏览器 `pnpm dev` 预览时走 mock */
+const IS_TAURI = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
 
 type Args = Record<string, unknown>
 
 export function invoke<T = unknown>(cmd: string, args?: Args): Promise<T> {
-  return tauriInvoke<T>(cmd, args ?? {})
+  return IS_TAURI ? tauriInvoke<T>(cmd, args ?? {}) : mockInvoke<T>(cmd, args ?? {})
 }
 
 export function listen<T = unknown>(event: string, handler: (payload: T) => void): Promise<() => void> {
-  return tauriListen<T>(event, (e) => handler(e.payload))
+  return IS_TAURI ? tauriListen<T>(event, (e) => handler(e.payload)) : mockListen<T>(event, handler)
 }
 
 export const appWindow = {

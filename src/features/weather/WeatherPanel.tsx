@@ -128,20 +128,17 @@ export default function WeatherPanel({ mode }: { mode: 'compact' | 'expanded' })
 
   const current = (
     <div className="w-current">
-      <div className="w-current__main">
-        <img className="w-current__icon" src={weatherIcon(icon)} alt="" />
-        <div>
-          <div className="w-current__temp num">{Math.round(cur.temperature)}°</div>
-          <div className="w-current__desc">{desc}</div>
+      <img className="w-current__icon" src={weatherIcon(icon)} alt="" />
+      <div className="w-current__col">
+        <div className="w-current__temp k-bignum num">
+          {Math.round(cur.temperature)}
+          <i className="w-current__deg">°</i>
         </div>
-      </div>
-      <div className="w-current__meta">
-        {today && (
-          <span className="num">
-            高 {Math.round(today.tempMax)}° / 低 {Math.round(today.tempMin)}°
-          </span>
-        )}
-        {rainToday != null && <span className="num">降水 {rainToday}%</span>}
+        <div className="w-current__desc">{desc}</div>
+        <div className="w-current__chips">
+          {today && <span className="num w-chip">高 {Math.round(today.tempMax)}° 低 {Math.round(today.tempMin)}°</span>}
+          {rainToday != null && <span className="num w-chip">降水 {rainToday}%</span>}
+        </div>
       </div>
     </div>
   )

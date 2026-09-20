@@ -44,30 +44,44 @@ export default function MonitorPanel({ mode }: { mode: 'compact' | 'expanded' })
   if (mode === 'compact') {
     return (
       <div className="m-compact">
-        <div className="m-compact__top">
-          <span className="m-compact__cpu num">{Math.round(s.cpu)}<small>%</small></span>
-          <span className="m-compact__label">CPU</span>
-          <span className="m-compact__right num" style={{ color: toneColor(tempTone(s.cpuTemp)) }}>
+        <div className="m-hero">
+          <span className="m-hero__temp num" style={{ color: toneColor(tempTone(s.cpuTemp)) }}>
             {s.cpuTemp != null ? `${Math.round(s.cpuTemp)}°` : ''}
           </span>
+          <div className="m-hero__num k-bignum num">
+            {Math.round(s.cpu)}
+            <small>%</small>
+          </div>
+          <span className="m-hero__label">CPU 占用</span>
         </div>
-        <div className="m-compact__mem">
-          <MemBar used={s.memUsed} total={s.memTotal} />
-          <span className="num m-compact__mem-text">
-            内存 {Math.round(s.memUsed)} / {Math.round(s.memTotal)} GB
-          </span>
-        </div>
-        <div className="m-compact__meta">
+        <div className="m-rows">
+          <div className="m-row">
+            <span className="m-row__label">内存</span>
+            <MemBar used={s.memUsed} total={s.memTotal} />
+            <b className="m-row__val num">
+              {Math.round(s.memUsed)}/{Math.round(s.memTotal)}G
+            </b>
+          </div>
           {s.gpu && (
-            <span className="num">
-              GPU {Math.round(s.gpu.util ?? 0)}%
-              {s.gpu.temp != null ? ` · ${Math.round(s.gpu.temp)}°` : ''}
-            </span>
+            <div className="m-row">
+              <span className="m-row__label">显卡</span>
+              <div className="m-bar">
+                <i style={{ width: `${s.gpu.util ?? 0}%`, background: 'var(--k-mod)' }} />
+              </div>
+              <b className="m-row__val num">
+                {Math.round(s.gpu.util ?? 0)}%
+                {s.gpu.temp != null ? ` · ${Math.round(s.gpu.temp)}°` : ''}
+              </b>
+            </div>
           )}
-          <span className="num m-net">
-            <ArrowDown size={11} /> {fmtSpeed(s.netDown)}
-            <ArrowUp size={11} /> {fmtSpeed(s.netUp)}
-          </span>
+          <div className="m-net num">
+            <span>
+              <ArrowDown size={11} /> {fmtSpeed(s.netDown)}
+            </span>
+            <span>
+              <ArrowUp size={11} /> {fmtSpeed(s.netUp)}
+            </span>
+          </div>
         </div>
       </div>
     )

@@ -86,13 +86,16 @@ function Playbar() {
 
 /** 歌词面板 */
 function LyricsPane() {
-  const { lyrics, lyricIndex } = usePlayer()
+  const { current, lyrics, lyricIndex } = usePlayer()
   const activeRef = useRef<HTMLParagraphElement | null>(null)
 
   useEffect(() => {
     activeRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
   }, [lyricIndex])
 
+  if (!current) {
+    return <div className="mu-lyrics mu-lyrics--hint">搜索并播放歌曲后，歌词会显示在这里</div>
+  }
   if (!lyrics) {
     return <div className="mu-lyrics mu-lyrics--hint">歌词加载中…</div>
   }
@@ -224,8 +227,14 @@ export default function MusicPanel({ mode }: { mode: 'compact' | 'expanded' }) {
     if (!current) {
       return (
         <div className="mu-compact mu-compact--idle">
-          <Music2 size={22} />
-          <p>展开卡片搜索歌曲</p>
+          <div className="mu-disc" aria-hidden>
+            <span className="mu-disc__groove" />
+            <span className="mu-disc__groove mu-disc__groove--2" />
+            <span className="mu-disc__core">
+              <Music2 size={22} />
+            </span>
+          </div>
+          <p>展开卡片，搜索想听的歌</p>
         </div>
       )
     }

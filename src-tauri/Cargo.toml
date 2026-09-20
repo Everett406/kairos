@@ -1,6 +1,6 @@
 [package]
 name = "kairos"
-version = "0.3.0"
+version = "0.3.1"
 description = "Kairos - liquid glass desktop assistant"
 authors = ["At210Co60"]
 license = "MIT"
