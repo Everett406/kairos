@@ -44,15 +44,17 @@
 
 ## 界面一览
 
-| 主画布 · 磨砂仪表 | 天气 · 弹窗 | 系统监控 · 弹窗 |
+| 主画布 · 磨砂仪表 | 指标抽屉 · 大曲线 | 全局命令条 · Ctrl+Alt+K |
 | --- | --- | --- |
-| ![主画布](docs/screenshots/01-home.png) | ![天气](docs/screenshots/02-weather.png) | ![系统](docs/screenshots/03-monitor.png) |
+| ![主画布](docs/screenshots/01-home.png) | ![抽屉](docs/screenshots/08-drawer.png) | ![命令条](docs/screenshots/09-cmd.png) |
 
-| 番茄钟 | 音乐 | 翻译 |
+| 天气 · 弹窗 | 系统监控 · 弹窗 | 番茄钟 |
 | --- | --- | --- |
-| ![番茄钟](docs/screenshots/04-pomodoro.png) | ![音乐](docs/screenshots/05-music.png) | ![翻译](docs/screenshots/07-translate.png) |
+| ![天气](docs/screenshots/02-weather.png) | ![系统](docs/screenshots/03-monitor.png) | ![番茄钟](docs/screenshots/04-pomodoro.png) |
 
-> 剪贴板与命令条、专注场景等更多形态见仓库 docs/screenshots/。
+| 音乐 | 剪贴板 | 翻译 |
+| --- | --- | --- |
+| ![音乐](docs/screenshots/05-music.png) | ![剪贴板](docs/screenshots/06-clipboard.png) | ![翻译](docs/screenshots/07-translate.png) |
 
 ## 安装
 
