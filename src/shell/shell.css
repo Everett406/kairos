@@ -905,7 +905,7 @@ body {
   gap: 3px;
 }
 .kx-cmdbar__grp {
-  padding: 6px 8px;
+  padding: 6px 8px 8px;
 }
 .kx-cmdbar__cap {
   display: block;
