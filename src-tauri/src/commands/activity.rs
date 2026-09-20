@@ -8,7 +8,7 @@
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 use std::time::Duration;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 const POLL_MS: u64 = 5000;
 const KEEP_DAYS: i64 = 7;
@@ -66,7 +66,7 @@ fn prune_old(app: &AppHandle) {
     let Some(d) = dir(app) else { return };
     let Ok(rd) = std::fs::read_dir(&d) else { return };
     for e in rd.flatten() {
-        let Some(name) = e.file_name().to_str() else { continue };
+        let name = e.file_name().to_string_lossy().into_owned();
         let Some(day) = name.strip_suffix(".json") else { continue };
         if day.len() != 10 {
             continue;
@@ -142,7 +142,7 @@ pub fn activity_today(app: AppHandle) -> Vec<ActivitySeg> {
         Some(c) if c.day == today => c.segs.clone(),
         _ => {
             let segs = load_day(&app, &today);
-            *guard = Some(Cache { day: today, segs: segs.clone(), dirty: false });
+            *guard = Some(Cache { day: today, segs: segs.clone() });
             segs
         }
     }

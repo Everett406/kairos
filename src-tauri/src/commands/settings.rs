@@ -32,6 +32,12 @@ pub fn settings_set(app: AppHandle, key: String, value: Value) -> Result<(), Str
     crate::store::write_json(&p, &Value::Object(map))
 }
 
+/// 设置页改键命令：前端已写好 settings，这里让新热键立即生效
+#[tauri::command]
+pub fn set_hotkeys(app: AppHandle, cmd: String, clip: String) -> Result<(), String> {
+    crate::apply_hotkeys(&app, &cmd, &clip)
+}
+
 // ===== 开机自启（Windows 注册表 HKCU Run，经 reg.exe，免新增依赖） =====
 
 #[cfg(windows)]
