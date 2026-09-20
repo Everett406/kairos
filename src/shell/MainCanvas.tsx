@@ -1,4 +1,5 @@
-import { Cpu, Gpu, MemoryStick, Timer, ChevronRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Cpu, Gpu, MemoryStick, ChevronRight } from 'lucide-react'
 import { AreaChart } from '../lib/charts'
 import { useMonitor } from '../features/monitor/useMonitor'
 import { tempTone, toneColor } from '../features/monitor/model'
@@ -6,10 +7,15 @@ import type { Stats } from '../features/monitor/model'
 import { useStatsHistory } from '../features/monitor/history'
 import { usePomodoro } from '../features/pomodoro/usePomodoro'
 import { fmtClock } from '../lib/format'
+import { useSettings } from '../lib/settings'
+import type { TileId } from '../lib/settings'
+import { fetchActivity, appColor, appLabel, sumByApp, fmtDuration } from '../features/activity/api'
+import type { ActivitySeg } from '../features/activity/api'
 
 /**
- * v4 主画布：一屏三区 —— 问候 + 三大指标卡 + 今日时间带（左），
- * 专注环 + 传感器（右）。图表 = 轻平滑 + 真实毛刺（v4 决策 2）。
+ * v0.4.1 主画布：问候行横贯全宽，卡片行分左右两列（顶部对齐指标卡）。
+ * 左列 = 三大指标卡 + 今日活动时间轴（应用使用 + 专注记录）；
+ * 右列 = 专注环 + 传感器。磁贴显隐由设置驱动。
  */
 
 export type MetricId = 'cpu' | 'gpu' | 'mem'
@@ -99,32 +105,72 @@ function MetricCard({
   )
 }
 
-/** 今日时间带：番茄钟会话如实落在 24h 轨道上（有会话才显示，不造假数据） */
-function TimeBand() {
+/**
+ * 今日活动时间轴：上层 = 前台应用使用段（每 30s 刷新，Rust 端 5s 采样），
+ * 下层 = 专注会话（琥珀）。统计行 = 最常用应用 + 专注合计 + 番茄数。
+ * 空数据时不造假：显示引导文案。
+ */
+function ActivityBand() {
   const p = usePomodoro()
-  const sessions = p.sessions
-  const focusMin = sessions.reduce((acc, s) => acc + (s.e - s.s) / 60000, 0)
-  const last = sessions.length ? sessions[sessions.length - 1].e : null
+  const [segs, setSegs] = useState<ActivitySeg[] | null>(null)
+
+  useEffect(() => {
+    let alive = true
+    const load = () =>
+      fetchActivity()
+        .then((s) => {
+          if (alive) setSegs(s)
+        })
+        .catch(() => {})
+    load()
+    const t = window.setInterval(load, 30_000)
+    return () => {
+      alive = false
+      window.clearInterval(t)
+    }
+  }, [])
+
+  const byApp = segs ? sumByApp(segs) : []
+  const top = byApp.slice(0, 3)
+  const focusMin = p.sessions.reduce((acc, s) => acc + (s.e - s.s) / 60000, 0)
   const nowMin = new Date().getHours() * 60 + new Date().getMinutes()
   const nowPct = (nowMin / 1440) * 100
 
   return (
     <section className="k-card kx-band">
       <header className="kx-band__hd">
-        <span className="kx-band__t">今日时间带</span>
+        <span className="kx-band__t">今日活动</span>
         <span className="kx-band__date">
           TODAY · {dateLine()}
         </span>
         <span className="kx-legend">
-          <i style={{ background: 'var(--k-warm)' }} />专注
+          <i className="kx-legend__apps" />
+          应用
+          <i style={{ background: 'var(--k-warm)', marginLeft: 10 }} />
+          专注
         </span>
       </header>
       <div className="kx-band__zone">
         <div className="kx-now" style={{ left: `${nowPct}%` }}>
           <span className="kx-now__chip num">{fmtClock(Date.now())}</span>
         </div>
-        <div className="kx-track">
-          {sessions.map((s, i) => {
+        <div className="kx-track kx-track--apps">
+          {(segs ?? []).map((s, i) => {
+            const startM = new Date(s.start).getHours() * 60 + new Date(s.start).getMinutes()
+            const endM = new Date(s.end).getHours() * 60 + new Date(s.end).getMinutes()
+            const lenM = Math.max(2, endM - startM)
+            return (
+              <span
+                key={i}
+                className="kx-track__app"
+                style={{ left: `${(startM / 1440) * 100}%`, width: `${(lenM / 1440) * 100}%`, background: appColor(s.app) }}
+                title={`${appLabel(s.app)} · ${fmtClock(s.start)} - ${fmtClock(s.end)}`}
+              />
+            )
+          })}
+        </div>
+        <div className="kx-track kx-track--focus">
+          {p.sessions.map((s, i) => {
             const startM = new Date(s.s).getHours() * 60 + new Date(s.s).getMinutes()
             const lenM = Math.max(2, (s.e - s.s) / 60000)
             return (
@@ -141,6 +187,23 @@ function TimeBand() {
         </div>
       </div>
       <footer className="kx-band__stats">
+        <div className="st kx-band__apps">
+          <b className="kx-band__apptop">
+            {top.length ? (
+              <>
+                <i style={{ background: appColor(top[0].app) }} />
+                {appLabel(top[0].app)}
+              </>
+            ) : (
+              '—'
+            )}
+          </b>
+          <span>{top.length ? `最常用 · ${fmtDuration(top[0].seconds)}` : '使用应用后自动记录在这里'}</span>
+        </div>
+        <div className="st">
+          <b className="num">{top[1] ? appLabel(top[1].app) : '—'}</b>
+          <span>{top[1] ? `次常用 · ${fmtDuration(top[1].seconds)}` : '—'}</span>
+        </div>
         <div className="st">
           <b className="num">{(focusMin / 60).toFixed(1)} 小时</b>
           <span>今日专注</span>
@@ -148,10 +211,6 @@ function TimeBand() {
         <div className="st">
           <b className="num">{p.doneCount}</b>
           <span>完成番茄</span>
-        </div>
-        <div className="st">
-          <b className="num">{last ? fmtClock(last) : '—'}</b>
-          <span>最近一次专注</span>
         </div>
       </footer>
     </section>
@@ -240,53 +299,85 @@ function Sensors() {
   )
 }
 
-export function MainCanvas({
+/** 磁贴渲染表：id → 组件 */
+function Tile({
+  id,
+  stats,
+  hist,
   onOpenMetric,
   onEnterFocus,
-  scene,
-  onScene,
 }: {
+  id: TileId
+  stats: Stats | null
+  hist: ReturnType<typeof useStatsHistory>
   onOpenMetric: (id: MetricId) => void
   onEnterFocus: () => void
-  scene: 'daily' | 'focus'
-  onScene: (s: 'daily' | 'focus') => void
 }) {
-  const stats = useMonitor()
-  const hist = useStatsHistory()
-
-  return (
-    <div className="canvas">
-      <div className="canvas__main">
-        <div className="kx-greet">
-          <div>
-            <div className="kx-greet__g">{greeting()}</div>
-            <div className="kx-greet__s">
-              {dateLine()} · {stats?.elevated ? '管理员模式' : '标准模式'}
-            </div>
-          </div>
-          <div className="kx-seg">
-            <button className={scene === 'daily' ? 'on' : ''} onClick={() => onScene('daily')}>
-              日常
-            </button>
-            <button className={scene === 'focus' ? 'on' : ''} onClick={onEnterFocus}>
-              <Timer size={12} /> 专注
-            </button>
-          </div>
-        </div>
-
-        <div className="kx-hero">
+  switch (id) {
+    case 'metrics':
+      return (
+        <div className="kx-hero" key="metrics">
           <MetricCard id="cpu" icon={Cpu} label="CPU" stats={stats} hist={hist.cpu} color="var(--k-chart-cpu)" onOpen={onOpenMetric} />
           <MetricCard id="gpu" icon={Gpu} label="GPU" stats={stats} hist={hist.gpu} color="var(--k-chart-gpu)" onOpen={onOpenMetric} />
           <MetricCard id="mem" icon={MemoryStick} label="内存" stats={stats} hist={hist.mem} color="var(--k-chart-mem)" onOpen={onOpenMetric} />
         </div>
+      )
+    case 'activity':
+      return <ActivityBand key="activity" />
+    case 'focus':
+      return <FocusRing key="focus" onEnter={onEnterFocus} />
+    case 'sensors':
+      return <Sensors key="sensors" />
+  }
+}
 
-        <TimeBand />
+export function MainCanvas({
+  onOpenMetric,
+  onEnterFocus,
+}: {
+  onOpenMetric: (id: MetricId) => void
+  onEnterFocus: () => void
+}) {
+  const stats = useMonitor()
+  const hist = useStatsHistory()
+  const settings = useSettings()
+
+  const tiles = settings.tiles
+  const mainTiles = tiles.filter((t) => t === 'metrics' || t === 'activity')
+  const sideTiles = tiles.filter((t) => t === 'focus' || t === 'sensors')
+  const empty = mainTiles.length === 0 && sideTiles.length === 0
+
+  return (
+    <div className="canvas">
+      <div className="kx-greet">
+        <div>
+          <div className="kx-greet__g">{greeting()}</div>
+          <div className="kx-greet__s">
+            {dateLine()} · {stats?.elevated ? '管理员模式' : '标准模式'}
+          </div>
+        </div>
       </div>
 
-      <div className="canvas__side">
-        <FocusRing onEnter={onEnterFocus} />
-        <Sensors />
-      </div>
+      {empty ? (
+        <div className="k-card kx-tilesempty">
+          所有主页磁贴都关闭了。右键标题栏齿轮 → 设置 → 主页磁贴 可重新打开。
+        </div>
+      ) : (
+        <div className="canvas__cols">
+          <div className="canvas__main">
+            {mainTiles.map((id) => (
+              <Tile key={id} id={id} stats={stats} hist={hist} onOpenMetric={onOpenMetric} onEnterFocus={onEnterFocus} />
+            ))}
+          </div>
+          {sideTiles.length > 0 && (
+            <div className="canvas__side">
+              {sideTiles.map((id) => (
+                <Tile key={id} id={id} stats={stats} hist={hist} onOpenMetric={onOpenMetric} onEnterFocus={onEnterFocus} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

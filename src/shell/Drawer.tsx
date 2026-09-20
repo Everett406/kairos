@@ -7,8 +7,8 @@ import { useStatsHistory } from '../features/monitor/history'
 import type { MetricId } from './MainCanvas'
 
 /**
- * 指标详情抽屉：点指标卡从右缘弹簧滑入，主画布压暗保持可见。
- * 详情即可视化 —— 大曲线（网格 + 峰值）+ 四格读数 + 关键信息行。
+ * 指标详情抽屉（v0.4.1 加宽 + 可视化增强）：
+ * 大曲线（网格 + 峰值）+ 每核负载 / 显存占用条 + 四格读数 + 关键信息行。
  */
 
 const META: Record<MetricId, { cap: string; title: string; color: string }> = {
@@ -25,6 +25,26 @@ function Stat({ icon: Icon, label, value }: { icon: typeof Cpu; label: string; v
         {label}
       </span>
       <b className="kx-stat__v num">{value}</b>
+    </div>
+  )
+}
+
+/** 每核负载小柱：高度 ∝ 占用，超 70% 染警示色 */
+function CoreBars({ cores, color }: { cores: number[]; color: string }) {
+  const list = cores.length ? cores : [0]
+  return (
+    <div className="kx-cores" title="每核负载（%）">
+      {list.map((v, i) => (
+        <span className="kx-cores__col" key={i}>
+          <i
+            style={{
+              height: `${Math.max(6, Math.min(100, v))}%`,
+              background: v >= 70 ? 'var(--k-danger)' : v >= 45 ? 'var(--k-warning)' : color,
+            }}
+          />
+          <em className="num">{Math.round(v)}</em>
+        </span>
+      ))}
     </div>
   )
 }
@@ -123,7 +143,7 @@ export function Drawer({
           <AreaChart
             vals={vals.length > 1 ? vals : [0, 0]}
             color={meta.color}
-            w={460}
+            w={540}
             h={170}
             grid
             peakLabel={isPercent ? '峰值' : undefined}
@@ -133,6 +153,60 @@ export function Drawer({
           <span>实时 · 每 2 秒采样</span>
           <span>{isPercent ? `窗口 ≈ 2 分钟` : `峰值 ${peak.toFixed(1)} GB`}</span>
         </div>
+
+        {metric === 'cpu' && (
+          <div className="kx-coreswrap">
+            <span className="kx-coreswrap__cap">每核负载</span>
+            <CoreBars cores={stats?.cpuCores ?? []} color={meta.color} />
+          </div>
+        )}
+
+        {metric === 'gpu' && gpu && (
+          <div className="kx-meter">
+            <div className="kx-meter__hd">
+              <span>显存占用</span>
+              <b className="num">
+                {gpu.memUsed != null ? (gpu.memUsed / 1024).toFixed(1) : '—'} / {gpu.memTotal != null ? (gpu.memTotal / 1024).toFixed(1) : '—'} GB
+              </b>
+            </div>
+            <div className="kx-meter__bar">
+              <i
+                style={{
+                  width: `${gpu.memUsed != null && gpu.memTotal ? Math.min(100, (gpu.memUsed / gpu.memTotal) * 100) : 0}%`,
+                  background: meta.color,
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {metric === 'mem' && (
+          <div className="kx-meter">
+            <div className="kx-meter__hd">
+              <span>物理内存</span>
+              <b className="num">{memPct}%</b>
+            </div>
+            <div className="kx-meter__bar">
+              <i style={{ width: `${memPct}%`, background: meta.color }} />
+            </div>
+            {stats?.disks[0] && (
+              <div className="kx-meter__hd kx-meter__hd--sub">
+                <span>{stats.disks[0].model}</span>
+                <b className="num">
+                  {stats.disks[0].usedGb} / {stats.disks[0].totalGb} GB
+                </b>
+              </div>
+            )}
+            <div className="kx-meter__bar">
+              <i
+                style={{
+                  width: `${stats?.disks[0] ? Math.min(100, (stats.disks[0].usedGb / Math.max(1, stats.disks[0].totalGb)) * 100) : 0}%`,
+                  background: 'var(--k-text-muted)',
+                }}
+              />
+            </div>
+          </div>
+        )}
 
         <div className="kx-stat4">{stat4}</div>
 

@@ -76,6 +76,19 @@
   --k-glass-alpha: 0.72;
   --k-glass-tint: 255, 255, 255;
   --k-glass-tint-alpha: 0.04;
+
+  /* ---- 磨砂窗体渐变（shell.css body 消费） ----
+   * --k-frost ∈ [0,1] 由设置页「磨砂浓度」驱动：1 = 最深邃（默认，壁纸仅隐约衬底），
+   * 0 = 最透，壁纸明显可见。真实窗口里叠在 Windows acrylic 之上。 */
+  --k-body-grad: linear-gradient(
+    168deg,
+    rgba(17, 22, 34, calc(0.55 + var(--k-frost, 0.88) * 0.35)),
+    rgba(10, 13, 20, calc(0.6 + var(--k-frost, 0.88) * 0.3))
+  );
+
+  /* ---- 浮出面板 / 专注场景底 ---- */
+  --k-panel-grad: linear-gradient(172deg, rgba(23, 28, 43, 0.96), rgba(14, 18, 28, 0.97));
+  --k-focus-grad: linear-gradient(172deg, rgba(13, 17, 27, 0.9), rgba(8, 11, 18, 0.94));
 }
 
 /* ============================================================

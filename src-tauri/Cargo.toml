@@ -1,6 +1,6 @@
 [package]
 name = "kairos"
-version = "0.4.0"
+version = "0.4.1"
 description = "Kairos - liquid glass desktop assistant"
 authors = ["At210Co60"]
 license = "MIT"
@@ -25,6 +25,8 @@ log = "0.4"
 reqwest = { version = "0.13", default-features = false, features = ["json", "rustls", "query", "gzip"] }
 sysinfo = "0.33"
 base64 = "0.22"
+chrono = "0.4"
+rfd = "0.15"
 
 [target.'cfg(windows)'.dependencies]
 wmi = "0.17"

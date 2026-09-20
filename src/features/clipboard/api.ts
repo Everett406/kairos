@@ -22,6 +22,11 @@ export function clipboardClear(): Promise<ClipItem[]> {
   return invoke<ClipItem[]>('clipboard_clear')
 }
 
+/** 置顶 / 取消置顶 */
+export function clipboardPin(id: string): Promise<ClipItem[]> {
+  return invoke<ClipItem[]>('clipboard_pin', { id })
+}
+
 export async function copyText(text: string): Promise<void> {
   const { writeText } = await import('@tauri-apps/plugin-clipboard-manager')
   await writeText(text)

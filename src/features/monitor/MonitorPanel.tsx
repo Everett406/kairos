@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { ArrowDown, ArrowUp, ShieldCheck, Cpu, MemoryStick, HardDrive, Wifi } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { ArrowDown, ArrowUp, ShieldCheck, Cpu, MemoryStick, HardDrive, Wifi, ListOrdered } from 'lucide-react'
 import { Button } from '../../design/primitives'
-import { fmtSpeed, pctTone, tempTone, toneColor, elevate } from './model'
+import { fmtSpeed, fetchProcTop, pctTone, tempTone, toneColor, elevate } from './model'
+import type { ProcInfo } from './model'
 import { useMonitor } from './useMonitor'
 import './monitor.css'
 
@@ -11,6 +12,73 @@ function MemBar({ used, total }: { used: number; total: number }) {
   return (
     <div className="m-bar">
       <i style={{ width: `${pct}%`, background: toneColor(tone) }} />
+    </div>
+  )
+}
+
+/** 每核负载小柱（与抽屉同款可视化） */
+function CoreBars({ cores, color }: { cores: number[]; color: string }) {
+  const list = cores.length ? cores : [0]
+  return (
+    <div className="kx-cores kx-cores--sm" title="每核负载（%）">
+      {list.map((v, i) => (
+        <span className="kx-cores__col" key={i}>
+          <i
+            style={{
+              height: `${Math.max(6, Math.min(100, v))}%`,
+              background: v >= 70 ? 'var(--k-danger)' : v >= 45 ? 'var(--k-warning)' : color,
+            }}
+          />
+          <em className="num">{Math.round(v)}</em>
+        </span>
+      ))}
+    </div>
+  )
+}
+
+/** 进程 Top：3s 轮询，仅展开态挂载 */
+function ProcTop() {
+  const [procs, setProcs] = useState<ProcInfo[]>([])
+  useEffect(() => {
+    let alive = true
+    const load = () =>
+      fetchProcTop()
+        .then((p) => {
+          if (alive) setProcs(p)
+        })
+        .catch(() => {})
+    load()
+    const t = window.setInterval(load, 3000)
+    return () => {
+      alive = false
+      window.clearInterval(t)
+    }
+  }, [])
+
+  const maxCpu = Math.max(1, ...procs.map((p) => p.cpu))
+  return (
+    <div className="m-section">
+      <h4>
+        <ListOrdered size={13} /> 进程占用 Top
+      </h4>
+      {procs.length === 0 ? (
+        <div className="k-empty">读取进程列表…（首次采样后显示 CPU 占用）</div>
+      ) : (
+        <div className="m-procs">
+          {procs.map((p) => (
+            <div className="m-proc" key={p.pid}>
+              <span className="m-proc__name" title={p.name}>
+                {p.name}
+              </span>
+              <span className="m-proc__bar">
+                <i style={{ width: `${Math.max(2, (p.cpu / maxCpu) * 100)}%` }} />
+              </span>
+              <b className="num m-proc__cpu">{p.cpu.toFixed(1)}%</b>
+              <b className="num m-proc__mem">{p.memMb >= 1024 ? `${(p.memMb / 1024).toFixed(1)}G` : `${Math.round(p.memMb)}M`}</b>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -87,7 +155,7 @@ export default function MonitorPanel({ mode }: { mode: 'compact' | 'expanded' })
     )
   }
 
-  // ===== 展开态 =====
+  // ===== 展开态（v0.4.1：每核可视化 + 进程 Top + 磁盘详情） =====
   const gpu = s.gpu
 
   return (
@@ -109,6 +177,7 @@ export default function MonitorPanel({ mode }: { mode: 'compact' | 'expanded' })
             </span>
             {s.fanCpu != null && <span className="num">{Math.round(s.fanCpu)} RPM</span>}
           </div>
+          <CoreBars cores={s.cpuCores ?? []} color="var(--k-chart-cpu)" />
         </div>
 
         <div className="m-cell">
@@ -133,7 +202,7 @@ export default function MonitorPanel({ mode }: { mode: 'compact' | 'expanded' })
           {gpu ? (
             <>
               <div className="m-bar">
-                <i style={{ width: `${gpu.util ?? 0}%` }} />
+                <i style={{ width: `${gpu.util ?? 0}%`, background: 'var(--k-chart-gpu)' }} />
               </div>
               <div className="m-cell__meta">
                 <span className="num" style={{ color: toneColor(tempTone(gpu.temp)) }}>
@@ -162,6 +231,8 @@ export default function MonitorPanel({ mode }: { mode: 'compact' | 'expanded' })
           </div>
         </div>
       </div>
+
+      <ProcTop />
 
       {s.disks.length > 0 && (
         <div className="m-section">

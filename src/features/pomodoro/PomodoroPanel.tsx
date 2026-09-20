@@ -29,18 +29,34 @@ export default function PomodoroPanel({ mode }: { mode: 'compact' | 'expanded' }
 
   const runningCls = running ? ' is-running' : ''
 
-  // R = 46, 周长 ≈ 289
+  // R = 46, 周长 ≈ 289；外圈刻度环 + 渐变描边（v0.4.1 设计感打磨）
   const CIRC = 2 * Math.PI * 46
 
   const dial = (
     <div className={`p-dial${runningCls}`}>
       <svg viewBox="0 0 100 100" aria-hidden>
+        <defs>
+          <linearGradient id="p-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="var(--k-mod)" />
+            <stop offset="1" stopColor="var(--k-warm)" />
+          </linearGradient>
+        </defs>
+        {/* 刻度环：60 格，安静表盘质感 */}
+        <circle
+          className="p-dial__ticks"
+          cx="50"
+          cy="50"
+          r="48.5"
+          strokeDasharray="0.55 4.5"
+          transform="rotate(-90 50 50)"
+        />
         <circle className="p-dial__track" cx="50" cy="50" r="46" />
         <circle
           className="p-dial__fill"
           cx="50"
           cy="50"
           r="46"
+          stroke="url(#p-grad)"
           strokeDasharray={CIRC}
           strokeDashoffset={CIRC * (1 - progress)}
           transform="rotate(-90 50 50)"
@@ -116,9 +132,12 @@ export default function PomodoroPanel({ mode }: { mode: 'compact' | 'expanded' }
       </div>
 
       <div className="p-stats">
-        <Tag tone={doneCount > 0 ? 'accent' : 'default'}>
-          今日完成 {doneCount} 个番茄
-        </Tag>
+        <div className="p-dots" title={`今日完成 ${doneCount} 个番茄`}>
+          {Array.from({ length: Math.max(doneCount, 1) }, (_, i) => (
+            <i key={i} className={i < doneCount ? 'is-done' : ''} />
+          ))}
+          <span className="num">{doneCount > 0 ? `${doneCount} 番茄` : '今日还没有番茄'}</span>
+        </div>
         {doneCount >= 4 && <Tag tone="success">已达成 {Math.floor(doneCount / 4)} 轮</Tag>}
       </div>
     </div>

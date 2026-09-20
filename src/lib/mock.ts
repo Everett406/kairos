@@ -6,8 +6,10 @@
 
 import type { AirQuality, GeoPlace, WeatherData } from '../features/weather/model'
 import type { ClipItem } from '../features/clipboard/api'
-import type { LyricsPayload, QqSong } from '../features/music/api'
+import type { LocalTrack, LyricsPayload, NeSong, QqSong } from '../features/music/api'
 import type { Stats } from '../features/monitor/model'
+import type { ActivitySeg } from '../features/activity/api'
+import type { KairosSettings } from './settings'
 
 const now = new Date()
 const pad = (n: number) => String(n).padStart(2, '0')
@@ -86,6 +88,7 @@ const AQI: AirQuality = {
 const STATS: Stats = {
   elevated: true,
   cpu: 31.6,
+  cpuCores: [22, 38, 17, 44, 29, 12, 51, 33, 41, 19, 27, 36, 14, 47, 25, 31],
   cpuName: 'AMD Ryzen 7 7840H w/ Radeon 780M Graphics',
   cpuFreqGhz: 4.87,
   cpuTemp: 58.4,
@@ -183,6 +186,64 @@ function translate(text: string, target: string) {
   return { text: `（${target} 译文）${trimmed}`, detected: 'zh-CN' }
 }
 
+// ===== v0.4.1 mock 扩展：活动记录 / 网易云 / 本地音乐 =====
+
+const SONG_COVER = (h1: string, h2: string) =>
+  `data:image/svg+xml;utf8,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${h1}"/><stop offset="1" stop-color="${h2}"/></linearGradient></defs><rect width="300" height="300" fill="url(#g)"/><circle cx="150" cy="150" r="52" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="7"/><circle cx="150" cy="150" r="9" fill="rgba(255,255,255,.8)"/></svg>`,
+  )}`
+
+const NE_SONGS: NeSong[] = [
+  { id: 1, name: '夜空中最亮的星', singer: '逃跑计划', album: '世界', picUrl: SONG_COVER('#3d4f8a', '#7ca5f7'), durationSec: 268, fee: 0 },
+  { id: 2, name: '平凡之路', singer: '朴树', album: '猎户座', picUrl: SONG_COVER('#4b4358', '#a79bf5'), durationSec: 323, fee: 0 },
+  { id: 3, name: '海阔天空', singer: 'Beyond', album: '乐与怒', picUrl: SONG_COVER('#37505c', '#6fcfc7'), durationSec: 326, fee: 1 },
+  { id: 4, name: '如也', singer: '毛不易', album: '平凡的一天', picUrl: SONG_COVER('#5a4a3c', '#e5b368'), durationSec: 245, fee: 0 },
+  { id: 5, name: '起风了', singer: '买辣椒也用券', album: '起风了', picUrl: SONG_COVER('#4a6258', '#8fd4b8'), durationSec: 325, fee: 0 },
+  { id: 6, name: '成都', singer: '赵雷', album: '无法长大', picUrl: SONG_COVER('#5c4a52', '#ef7d9d'), durationSec: 328, fee: 1 },
+]
+
+const LOCAL_TRACKS: LocalTrack[] = [
+  { path: 'D:/Music/周杰伦 - 晴天.mp3', name: '晴天', artist: '周杰伦', sizeMb: 8.4 },
+  { path: 'D:/Music/陈奕迅 - 孤勇者.flac', name: '孤勇者', artist: '陈奕迅', sizeMb: 31.2 },
+  { path: 'D:/Music/朴树 - 那些花儿.mp3', name: '那些花儿', artist: '朴树', sizeMb: 7.1 },
+  { path: 'D:/Music/告五人 - 唯一.m4a', name: '唯一', artist: '告五人', sizeMb: 9.8 },
+  { path: 'D:/Music/周杰伦 - 七里香.flac', name: '七里香', artist: '周杰伦', sizeMb: 28.6 },
+  { path: 'D:/Music/五月天 - 温柔.mp3', name: '温柔', artist: '五月天', sizeMb: 8.9 },
+]
+
+/** 今天 08:00 起到现在的活动段（按分钟铺一条真实的作息） */
+function genActivity(): ActivitySeg[] {
+  const midnight = new Date()
+  midnight.setHours(0, 0, 0, 0)
+  const nowMin = Math.max(600, Math.round((Date.now() - midnight.getTime()) / 60000))
+  // [app, title, startMin, endMin]
+  const plan: [string, string, number, number][] = [
+    ['code', 'kairos — HANDOFF.md', 8 * 60 + 6, 9 * 60 + 47],
+    ['chrome', 'GitHub - Everett406/kairos', 9 * 60 + 47, 10 * 60 + 12],
+    ['code', 'ActivityBand.tsx — kairos', 10 * 60 + 12, 11 * 60 + 38],
+    ['weixin', '微信', 11 * 60 + 38, 11 * 60 + 55],
+    ['chrome', 'MDN Web Docs — backdrop-filter', 11 * 60 + 55, 12 * 60 + 21],
+    ['kairos', 'Kairos', 12 * 60 + 21, 12 * 60 + 44],
+    ['explorer', 'D:/Music', 12 * 60 + 44, 12 * 60 + 51],
+    ['code', 'shell.css — kairos', 12 * 60 + 51, 14 * 60 + 9],
+    ['steam', 'Steam 图书馆', 14 * 60 + 9, 14 * 60 + 58],
+    ['chrome', 'Bilibili — 4K 显示器测评', 14 * 60 + 58, 15 * 60 + 26],
+    ['code', 'WeatherPanel.tsx — kairos', 15 * 60 + 26, 16 * 60 + 2],
+    ['msedge', '知乎 — 磨砂玻璃 UI', 16 * 60 + 2, 16 * 60 + 17],
+  ]
+  const out: ActivitySeg[] = []
+  for (const [app, title, s, e] of plan) {
+    if (s >= nowMin) break
+    out.push({
+      app,
+      title,
+      start: midnight.getTime() + s * 60_000,
+      end: midnight.getTime() + Math.min(e, nowMin) * 60_000,
+    })
+  }
+  return out
+}
+
 export function mockInvoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
   const a = args ?? {}
   const ok = (v: unknown) => Promise.resolve(v as T)
@@ -206,13 +267,64 @@ export function mockInvoke<T>(cmd: string, args?: Record<string, unknown>): Prom
       // 内存慢漂移：真实系统里随应用开关缓变
       STATS.memUsed = Math.min(16, Math.max(9, STATS.memUsed + (Math.random() - 0.5) * 0.24))
       if (STATS.gpu) STATS.gpu.util = Math.min(98, Math.max(3, STATS.gpu.util + (Math.random() - 0.5) * 10))
+      // 每核抖动（围绕各自基准起伏）
+      STATS.cpuCores = STATS.cpuCores.map((c) => Math.min(98, Math.max(2, c + (Math.random() - 0.5) * 14)))
       // 返回深克隆：保持每次调用引用不同，否则 React setState 判等会跳过更新
       return ok({
         ...STATS,
+        cpuCores: [...STATS.cpuCores],
         disks: STATS.disks.map((d) => ({ ...d, volumes: d.volumes.map((v) => ({ ...v })) })),
         gpu: STATS.gpu ? { ...STATS.gpu } : null,
       })
     }
+    case 'process_top':
+      return ok([
+        { name: 'code', pid: 8241, memMb: 682.4, cpu: 12.6 },
+        { name: 'chrome', pid: 11903, memMb: 1024.8, cpu: 8.3 },
+        { name: 'kairos', pid: 35212, memMb: 96.2, cpu: 2.1 },
+        { name: 'steamwebhelper', pid: 6612, memMb: 431.5, cpu: 1.8 },
+        { name: 'msedge', pid: 27718, memMb: 388.1, cpu: 1.2 },
+        { name: 'explorer', pid: 2296, memMb: 142.6, cpu: 0.6 },
+        { name: 'dwm', pid: 1512, memMb: 88.4, cpu: 0.5 },
+        { name: 'weixin', pid: 9181, memMb: 296.9, cpu: 0.4 },
+      ])
+    case 'activity_today':
+      return ok(genActivity())
+    case 'settings_get': {
+      try {
+        const raw = localStorage.getItem('kairos.mock.settings')
+        return ok(raw ? JSON.parse(raw) : null)
+      } catch {
+        return ok(null)
+      }
+    }
+    case 'settings_set': {
+      try {
+        localStorage.setItem('kairos.mock.settings', JSON.stringify(a.value ?? {}))
+      } catch {
+        /* 忽略 */
+      }
+      return ok(undefined)
+    }
+    case 'set_hotkeys':
+      return ok(undefined)
+    case 'autostart_status':
+      return ok(false)
+    case 'autostart_set':
+      return Promise.reject('浏览器预览不支持开机自启')
+    case 'pick_folder':
+      return Promise.reject('浏览器预览不支持文件夹选择')
+    case 'ne_search_songs': {
+      const kw = String(a.keyword ?? '').trim().toLowerCase()
+      const hit = kw ? NE_SONGS.filter((t) => (t.name + t.singer + t.album).toLowerCase().includes(kw)) : []
+      return ok(kw ? hit : NE_SONGS)
+    }
+    case 'ne_song_url':
+      return Promise.reject('NO_URL：浏览器预览不提供音源')
+    case 'ne_lyric':
+      return ok(LYRICS)
+    case 'local_music_scan':
+      return ok(LOCAL_TRACKS)
     case 'system_elevate':
       return Promise.reject('浏览器预览不支持提权')
     case 'qq_search_songs':
@@ -234,6 +346,12 @@ export function mockInvoke<T>(cmd: string, args?: Record<string, unknown>): Prom
       CLIPS.length = 0
       CLIPS.push(...rest)
       return ok([...rest])
+    }
+    case 'clipboard_pin': {
+      const it = CLIPS.find((c) => c.id === a.id)
+      if (it) it.pin = !it.pin
+      CLIPS.sort((x, y) => Number(y.pin ?? false) - Number(x.pin ?? false) || y.at - x.at)
+      return ok([...CLIPS])
     }
     case 'clipboard_clear':
       CLIPS.length = 0

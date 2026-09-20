@@ -390,6 +390,8 @@ mod win {
 pub struct Stats {
     pub elevated: bool,
     pub cpu: f64,
+    /// 每核占用（抽屉/监控可视化用，0-100）
+    pub cpu_cores: Vec<f64>,
     pub cpu_name: Option<String>,
     pub cpu_freq_ghz: Option<f64>,
     pub cpu_temp: Option<f64>,
@@ -446,7 +448,7 @@ fn r1(v: f64) -> f64 {
 #[tauri::command]
 pub fn system_stats(state: tauri::State<'_, Arc<SystemState>>) -> Result<Stats, String> {
     // CPU + 内存（sysinfo）
-    let (cpu, freq_mhz, mem_used, mem_total) = {
+    let (cpu, freq_mhz, mem_used, mem_total, cpu_cores) = {
         let mut sys = state.sys.lock().unwrap();
         sys.refresh_specifics(
             sysinfo::RefreshKind::default()
@@ -457,7 +459,12 @@ pub fn system_stats(state: tauri::State<'_, Arc<SystemState>>) -> Result<Stats, 
         let freq = sys.cpus().first().map(|c| c.frequency()).unwrap_or(0);
         let mem_used = sys.used_memory() as f64;
         let mem_total = sys.total_memory() as f64;
-        (cpu, freq, mem_used, mem_total)
+        let cores: Vec<f64> = sys
+            .cpus()
+            .iter()
+            .map(|c| (c.cpu_usage() as f64 * 10.0).round() / 10.0)
+            .collect();
+        (cpu, freq, mem_used, mem_total, cores)
     };
 
     // 网络：增量 / 间隔
@@ -491,6 +498,7 @@ pub fn system_stats(state: tauri::State<'_, Arc<SystemState>>) -> Result<Stats, 
     let mut stats = Stats {
         elevated: false,
         cpu: r1(cpu),
+        cpu_cores,
         cpu_name: None,
         cpu_freq_ghz: if freq_mhz > 0 { Some((freq_mhz as f64 / 1000.0 * 100.0).round() / 100.0) } else { None },
         cpu_temp: None,
@@ -609,4 +617,45 @@ pub fn system_elevate() -> Result<(), String> {
     return win::elevate_and_restart();
     #[cfg(not(windows))]
     Err("仅 Windows 支持提权".into())
+}
+
+// ===== 进程 Top（监控弹窗用，单独命令避免拖慢 2s 主轮询） =====
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProcInfo {
+    pub name: String,
+    pub pid: u32,
+    pub mem_mb: f64,
+    pub cpu: f64,
+}
+
+/// 占用 Top 进程：首次调用 cpu 为 0（需两次采样间隔），随后每 3s 轮询即有效
+#[tauri::command]
+pub fn process_top(state: tauri::State<'_, Arc<SystemState>>) -> Result<Vec<ProcInfo>, String> {
+    let mut sys = state.sys.lock().unwrap();
+    sys.refresh_processes_specifics(
+        sysinfo::ProcessesToUpdate::All,
+        true,
+        sysinfo::ProcessRefreshKind::default().with_memory().with_cpu(),
+    );
+    let mut procs: Vec<ProcInfo> = sys
+        .processes()
+        .values()
+        .map(|p| ProcInfo {
+            name: p.name().to_string_lossy().trim_end_matches(".exe").to_lowercase(),
+            pid: p.pid().as_u32(),
+            mem_mb: (p.memory() as f64 / 1_048_576.0 * 10.0).round() / 10.0,
+            cpu: (p.cpu_usage() as f64 * 10.0).round() / 10.0,
+        })
+        .collect();
+    procs.retain(|p| !p.name.is_empty() && p.mem_mb > 0.5);
+    procs.sort_by(|a, b| {
+        b.cpu
+            .partial_cmp(&a.cpu)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then(b.mem_mb.partial_cmp(&a.mem_mb).unwrap_or(std::cmp::Ordering::Equal))
+    });
+    procs.truncate(10);
+    Ok(procs)
 }
