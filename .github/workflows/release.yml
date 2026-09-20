@@ -82,7 +82,6 @@ jobs:
           $resDir = Join-Path (Split-Path $exe) "resources"
           if (Test-Path $resDir) { Copy-Item $resDir "$stage/resources" -Recurse -Force }
           Compress-Archive -Path $stage -DestinationPath "Kairos_${ver}_x64-portable.zip" -Force
-          "name=Kairos_${ver}_x64-portable.zip" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Upload portable zip to draft release
         shell: pwsh
@@ -90,9 +89,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UPLOAD_URL: ${{ steps.build.outputs.releaseUploadUrl }}
         run: |
-          $name = (Get-Content $env:GITHUB_OUTPUT | Where-Object { $_ -like 'name=*' }) -replace '^name=', ''
+          # 修复 v0.3.1 的 422：$env:GITHUB_OUTPUT 跨步不可读（每 step 独立文件），
+          # 直接用本地 zip 文件名，不再依赖步骤间输出传递
           $zip = Get-ChildItem -Filter "*portable.zip" | Select-Object -First 1
           if (-not $zip) { throw "portable zip not found" }
+          $name = $zip.Name
           $url = $env:UPLOAD_URL -replace '\{\?name,label\}', "?name=$name"
           Invoke-WebRequest -Method Post -Uri $url `
             -Headers @{ Authorization = "Bearer $env:GITHUB_TOKEN" } `
