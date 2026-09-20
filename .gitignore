@@ -12,11 +12,7 @@ dist
 dist-ssr
 *.local
 
-# Playwright MCP 本地测试产物
-.playwright-mcp/
-
 # 本地检查截图与下载存档(不入库)
-# 仅限仓库根目录的截图；src/assets 下的同名资源属于项目资源，必须入库
 /kairos-*.png
 lhm.zip
 
@@ -31,10 +27,9 @@ lhm.zip
 /whoami-elev.txt
 /liquid-glass-demo.html
 
-# LibreHardwareMonitor 的运行时状态：整个文件都是逐传感器的 plot 开关与采样历史
-# (含本机网卡 GUID、电池数据)以及 authenticationPassword 哈希，每次运行都会被 LHM
-# 重写，属于机器本地状态，不入库。缺失时 LHM 首次运行会自动生成默认配置。
-electron/vendor/LibreHardwareMonitor/LibreHardwareMonitor.config
+# LibreHardwareMonitor 随包分发：git 不放二进制，CI 构建时下载填充
+src-tauri/resources/LibreHardwareMonitor/*
+!src-tauri/resources/LibreHardwareMonitor/README.md
 
 # Editor directories and files
 .vscode/*
@@ -46,3 +41,4 @@ electron/vendor/LibreHardwareMonitor/LibreHardwareMonitor.config
 *.njsproj
 *.sln
 *.sw?
+bun.lock

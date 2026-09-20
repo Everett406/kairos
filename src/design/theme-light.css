@@ -1,0 +1,41 @@
+/* ============================================================
+ * Kairos Semantic 层 · 亮色主题
+ * 与 theme-dark.css 键完全同构，只换值。
+ * ============================================================ */
+
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --k-bg-base: var(--k-gray-100);
+  --k-bg-glow: rgba(59, 110, 245, 0.07);
+  --k-bg-card: rgba(255, 255, 255, 0.72);
+  --k-bg-card-hover: rgba(255, 255, 255, 0.92);
+  --k-bg-inset: rgba(19, 22, 28, 0.055);
+  --k-bg-elevated: #ffffff;
+  --k-bg-hover: rgba(19, 22, 28, 0.05);
+
+  --k-text-primary: #1c1f24;
+  --k-text-secondary: rgba(28, 31, 36, 0.64);
+  --k-text-muted: rgba(28, 31, 36, 0.4);
+  --k-text-on-accent: #ffffff;
+
+  --k-stroke-hairline: rgba(19, 22, 28, 0.08);
+  --k-stroke-subtle: rgba(19, 22, 28, 0.14);
+  --k-stroke-strong: rgba(19, 22, 28, 0.28);
+
+  --k-accent: var(--k-blue-500);
+  --k-accent-strong: var(--k-blue-600);
+  --k-accent-soft: rgba(59, 110, 245, 0.12);
+  --k-accent-text: var(--k-blue-600);
+  --k-success: #178a4c;
+  --k-success-soft: rgba(23, 138, 76, 0.1);
+  --k-warning: #b97a08;
+  --k-warning-soft: rgba(185, 122, 8, 0.1);
+  --k-danger: #d4473f;
+  --k-danger-soft: rgba(212, 71, 63, 0.1);
+
+  --k-glass-blur: 16px;
+  --k-glass-alpha: 0.8;
+  --k-glass-tint: 255, 255, 255;
+  --k-glass-tint-alpha: 0.55;
+}

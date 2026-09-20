@@ -1,0 +1,129 @@
+/* ============================================================
+ * 翻译 · 主题色 --k-mod: #2dd4bf
+ * ============================================================ */
+
+.t-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--k-space-3) var(--k-space-4) var(--k-space-4);
+}
+
+/* 输入区：玻璃凹陷 */
+.t-source {
+  flex: 1.1;
+  min-height: 0;
+  display: flex;
+}
+.t-area {
+  flex: 1;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: var(--k-space-3) !important;
+  font-size: var(--k-text-md);
+  line-height: 1.6;
+  resize: none;
+}
+
+/* 工具行：目标语言 + 状态 */
+.t-toolbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 26px;
+}
+.t-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--k-text-muted);
+}
+.t-lang > svg {
+  color: var(--k-mod);
+}
+.t-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--k-bg-inset-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23939aa6' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right 10px center;
+  border: 1px solid var(--k-stroke-hairline);
+  border-radius: var(--k-radius-full);
+  color: var(--k-text-secondary);
+  font: inherit;
+  font-size: var(--k-text-xs);
+  padding: 3px 26px 3px 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--k-dur-fast) var(--k-ease-standard),
+    color var(--k-dur-fast) var(--k-ease-standard);
+}
+.t-select:hover {
+  border-color: var(--k-mod-border);
+  color: var(--k-text-primary);
+}
+.t-select:focus {
+  border-color: var(--k-mod-border);
+}
+.t-select option {
+  background: #1a1e28;
+  color: var(--k-text-primary);
+}
+.t-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.t-spin {
+  animation: t-rot 0.9s linear infinite;
+  color: var(--k-mod);
+}
+@keyframes t-rot {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 结果区 */
+.t-result {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  padding: var(--k-space-3);
+  border-radius: var(--k-radius-md);
+  background: linear-gradient(150deg, var(--k-mod-soft), transparent 140%), var(--k-bg-inset-soft);
+  border: 1px solid var(--k-stroke-hairline);
+  opacity: 0.72;
+  transition: opacity var(--k-dur-base) var(--k-ease-standard),
+    border-color var(--k-dur-base) var(--k-ease-standard);
+}
+.t-result.is-on {
+  opacity: 1;
+  border-color: var(--k-mod-border);
+}
+.t-text {
+  font-size: var(--k-text-md);
+  line-height: 1.65;
+  color: var(--k-text-primary);
+  overflow-y: auto;
+  max-height: 100%;
+  user-select: text;
+  cursor: text;
+}
+.t-placeholder {
+  font-size: var(--k-text-sm);
+  color: var(--k-text-faint);
+}
+.t-error {
+  font-size: var(--k-text-sm);
+  color: var(--k-danger);
+  word-break: break-all;
+}
+.t-copy {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  height: 26px;
+  background: var(--k-bg-inset) !important;
+}

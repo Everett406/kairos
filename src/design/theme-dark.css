@@ -1,0 +1,126 @@
+/* ============================================================
+ * Kairos Semantic 层 · 暗色主题（默认）
+ * 只表达界面语义；换肤 = 新增一份同结构映射文件。
+ * 组件样式只允许引用本层变量。
+ * ============================================================ */
+
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* ---- 表面 ---- */
+  --k-bg-base: var(--k-gray-950);           /* 窗口底 */
+  --k-bg-card: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.072),
+    rgba(255, 255, 255, 0.028) 42%,
+    rgba(255, 255, 255, 0.04) 100%
+  );                                        /* 卡片面：微渐变玻璃 */
+  --k-bg-card-hover: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.04) 46%,
+    rgba(255, 255, 255, 0.055) 100%
+  );
+  --k-bg-inset: rgba(0, 0, 0, 0.32);        /* 输入框 / 凹陷区 */
+  --k-bg-inset-soft: rgba(0, 0, 0, 0.2);    /* 更浅的凹陷（日条 / 小块） */
+  --k-bg-elevated: var(--k-gray-850);       /* 弹层 / 浮出 */
+  --k-bg-hover: rgba(255, 255, 255, 0.07);  /* 通用悬停 */
+
+  /* ---- 文字 ---- */
+  --k-text-primary: #eef1f6;
+  --k-text-secondary: rgba(238, 241, 246, 0.68);
+  --k-text-muted: rgba(238, 241, 246, 0.42);
+  --k-text-faint: rgba(238, 241, 246, 0.28);
+  --k-text-on-accent: #ffffff;
+
+  /* ---- 描边 ---- */
+  --k-hairline-hi: rgba(255, 255, 255, 0.1);       /* 卡片顶部内高光 */
+  --k-stroke-hairline: rgba(255, 255, 255, 0.08);  /* 卡片描边 */
+  --k-stroke-subtle: rgba(255, 255, 255, 0.14);    /* 输入框 / 分隔 */
+  --k-stroke-strong: rgba(255, 255, 255, 0.26);
+
+  /* ---- 品牌 / 状态 ---- */
+  --k-accent: var(--k-blue-400);
+  --k-accent-strong: var(--k-blue-500);
+  --k-accent-soft: rgba(96, 145, 250, 0.16);
+  --k-accent-text: var(--k-blue-300);
+  --k-success: #4ade80;
+  --k-success-soft: rgba(74, 222, 128, 0.14);
+  --k-warning: #fbbf24;
+  --k-warning-soft: rgba(251, 191, 36, 0.14);
+  --k-danger: #fb7185;
+  --k-danger-soft: rgba(251, 113, 133, 0.14);
+
+  /* ---- 默认模块色（未匹配到 data-mod 时的兜底） ---- */
+  --k-mod: var(--k-blue-400);
+  --k-mod-soft: rgba(96, 145, 250, 0.14);
+  --k-mod-border: rgba(96, 145, 250, 0.3);
+  --k-mod-glow: rgba(96, 145, 250, 0.2);
+
+  /* ---- 背景氛围光（base.css 消费） ---- */
+  --k-glow-1: rgba(72, 138, 255, 0.14);     /* 左上 · 蓝 */
+  --k-glow-2: rgba(168, 85, 247, 0.11);     /* 右上 · 紫 */
+  --k-glow-3: rgba(255, 122, 89, 0.075);    /* 底部 · 暖橙 */
+
+  /* ---- v4 Quiet Instrument：图表三色 + 琥珀强调 ---- */
+  --k-chart-cpu: #7ca5f7;
+  --k-chart-gpu: #a79bf5;
+  --k-chart-mem: #6fcfc7;
+  --k-warm: #e5b368;
+  --k-warm-soft: rgba(229, 179, 104, 0.14);
+  --k-warm-border: rgba(229, 179, 104, 0.32);
+
+  /* ---- 玻璃参数（换肤入口） ---- */
+  --k-glass-blur: 22px;
+  --k-glass-alpha: 0.72;
+  --k-glass-tint: 255, 255, 255;
+  --k-glass-tint-alpha: 0.04;
+}
+
+/* ============================================================
+ * 模块主题色：每张卡通过 data-mod 注入自己的色彩个性
+ * 图标、进度、焦点、悬停光晕都跟着 --k-mod 走
+ * ============================================================ */
+
+[data-mod='weather'] {
+  --k-mod: #64b5ff;
+  --k-mod-soft: rgba(100, 181, 255, 0.15);
+  --k-mod-border: rgba(100, 181, 255, 0.32);
+  --k-mod-glow: rgba(100, 181, 255, 0.22);
+}
+
+[data-mod='monitor'] {
+  --k-mod: #4ade80;
+  --k-mod-soft: rgba(74, 222, 128, 0.14);
+  --k-mod-border: rgba(74, 222, 128, 0.32);
+  --k-mod-glow: rgba(74, 222, 128, 0.2);
+}
+
+[data-mod='pomodoro'] {
+  --k-mod: #ff7e67;
+  --k-mod-soft: rgba(255, 126, 103, 0.14);
+  --k-mod-border: rgba(255, 126, 103, 0.32);
+  --k-mod-glow: rgba(255, 126, 103, 0.22);
+}
+
+[data-mod='music'] {
+  --k-mod: #c084fc;
+  --k-mod-soft: rgba(192, 132, 252, 0.14);
+  --k-mod-border: rgba(192, 132, 252, 0.32);
+  --k-mod-glow: rgba(192, 132, 252, 0.22);
+}
+
+[data-mod='clipboard'] {
+  --k-mod: #f6c453;
+  --k-mod-soft: rgba(246, 196, 83, 0.14);
+  --k-mod-border: rgba(246, 196, 83, 0.32);
+  --k-mod-glow: rgba(246, 196, 83, 0.2);
+}
+
+[data-mod='translate'] {
+  --k-mod: #2dd4bf;
+  --k-mod-soft: rgba(45, 212, 191, 0.14);
+  --k-mod-border: rgba(45, 212, 191, 0.32);
+  --k-mod-glow: rgba(45, 212, 191, 0.2);
+}

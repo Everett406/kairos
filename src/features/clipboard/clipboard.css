@@ -1,0 +1,162 @@
+/* ============================================================
+ * 剪贴板 · 主题色 --k-mod: #f6c453
+ * ============================================================ */
+
+.c-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 列表 */
+.c-list {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--k-space-3) var(--k-space-3) var(--k-space-2);
+}
+
+/* 单条记录 */
+.c-row {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--k-radius-md);
+  background: var(--k-bg-inset-soft);
+  border: 1px solid var(--k-stroke-hairline);
+  cursor: pointer;
+  transition: border-color var(--k-dur-fast) var(--k-ease-standard),
+    background var(--k-dur-fast) var(--k-ease-standard);
+}
+.c-row:hover {
+  border-color: var(--k-mod-border);
+  background: var(--k-mod-soft);
+}
+
+/* 类型图标：小芯片 */
+.c-row__icon {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--k-text-muted);
+  background: var(--k-bg-inset);
+}
+.c-row__icon.is-link {
+  color: var(--k-mod);
+  background: var(--k-mod-soft);
+}
+
+.c-row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.c-row__text {
+  font-size: var(--k-text-sm);
+  line-height: 1.45;
+  color: var(--k-text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-all;
+}
+.c-row__link {
+  font-size: var(--k-text-sm);
+  line-height: 1.45;
+  color: var(--k-mod);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.c-row__time {
+  font-size: 11px;
+  color: var(--k-text-faint);
+}
+
+/* 已复制反馈 */
+.c-row__copied {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--k-mod);
+  opacity: 0;
+  transform: translateX(4px);
+  transition: opacity var(--k-dur-fast) var(--k-ease-standard),
+    transform var(--k-dur-fast) var(--k-ease-standard);
+}
+.c-row__copied.is-on {
+  opacity: 1;
+  transform: none;
+}
+
+/* 删除按钮：hover 浮现 */
+.c-row__del {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin: 1px -3px 0 0;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--k-text-faint);
+  opacity: 0;
+  transition: opacity var(--k-dur-fast) var(--k-ease-standard),
+    background var(--k-dur-fast) var(--k-ease-standard),
+    color var(--k-dur-fast) var(--k-ease-standard);
+}
+.c-row:hover .c-row__del {
+  opacity: 1;
+}
+.c-row__del:hover {
+  color: var(--k-danger);
+  background: var(--k-danger-soft);
+}
+
+/* 底部：更多提示 / 清空 */
+.c-more {
+  flex: none;
+  text-align: center;
+  padding: 6px 0 10px;
+  font-size: 11px;
+  color: var(--k-text-faint);
+}
+.c-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px var(--k-space-4) var(--k-space-3);
+  border-top: 1px solid var(--k-stroke-hairline);
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+
+/* 空态 */
+.c-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.c-init {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--k-text-muted);
+  font-size: var(--k-text-sm);
+}

@@ -1,0 +1,212 @@
+/* ============================================================
+ * 番茄钟 · 主题色 --k-mod: #ff7e67
+ * ============================================================ */
+
+/* ---- 环形表盘 ---- */
+.p-dial {
+  position: relative;
+  width: 158px;
+  height: 158px;
+  flex: none;
+}
+.p-dial svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.p-dial__track {
+  fill: none;
+  stroke: var(--k-bg-inset);
+  stroke-width: 5;
+}
+.p-dial__fill {
+  fill: none;
+  stroke: var(--k-mod);
+  stroke-width: 5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px var(--k-mod-glow));
+  transition: stroke-dashoffset 0.3s linear;
+}
+.p-dial__inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.p-dial__time {
+  font-family: var(--k-font-display);
+  font-weight: 600;
+  font-size: 30px;
+  letter-spacing: -0.02em;
+  color: var(--k-text-primary);
+}
+.p-dial__mode {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--k-mod);
+}
+
+/* 运行中：光晕呼吸 */
+.p-dial.is-running {
+  animation: p-breathe 2.6s ease-in-out infinite;
+}
+@keyframes p-breathe {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 10px var(--k-mod-glow));
+  }
+  50% {
+    filter: drop-shadow(0 0 26px var(--k-mod-glow));
+  }
+}
+
+/* ---- 紧凑态 ---- */
+.p-compact {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--k-space-4) var(--k-space-4) var(--k-space-4);
+}
+.p-compact .p-dial {
+  flex: 1;
+  align-self: center;
+  max-width: 168px;
+  max-height: 168px;
+  aspect-ratio: 1;
+  margin: auto 0;
+}
+.p-compact__foot {
+  flex: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.p-today {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+.p-today svg {
+  color: var(--k-mod);
+}
+.p-compact__btns {
+  display: inline-flex;
+  gap: 6px;
+}
+
+/* 主按钮：模块色圆钮 */
+.p-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--k-radius-full);
+  color: var(--k-text-secondary);
+  background: var(--k-bg-inset-soft);
+  border: 1px solid var(--k-stroke-hairline);
+  transition: background var(--k-dur-fast) var(--k-ease-standard),
+    color var(--k-dur-fast) var(--k-ease-standard), border-color var(--k-dur-fast) var(--k-ease-standard);
+}
+.p-icon-btn:hover {
+  color: var(--k-mod);
+  border-color: var(--k-mod-border);
+  background: var(--k-mod-soft);
+}
+.p-icon-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ---- 展开态 ---- */
+.p-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--k-space-4);
+  padding-top: var(--k-space-2);
+}
+.p-detail .p-dial {
+  width: 190px;
+  height: 190px;
+}
+.p-detail .p-dial__time {
+  font-size: 38px;
+}
+
+/* 模式切换：分段胶囊 */
+.p-modes {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--k-radius-full);
+  background: var(--k-bg-inset);
+  border: 1px solid var(--k-stroke-hairline);
+}
+.p-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 7px 18px;
+  border-radius: var(--k-radius-full);
+  font-size: var(--k-text-sm);
+  font-weight: 550;
+  color: var(--k-text-muted);
+  transition: background var(--k-dur-fast) var(--k-ease-standard),
+    color var(--k-dur-fast) var(--k-ease-standard);
+}
+.p-mode:hover {
+  color: var(--k-text-secondary);
+}
+.p-mode.is-active {
+  background: var(--k-mod-soft);
+  color: var(--k-mod);
+  box-shadow: inset 0 0 0 1px var(--k-mod-border);
+}
+.p-mode__min {
+  font-size: 10px;
+  color: var(--k-text-faint);
+}
+.p-mode.is-active .p-mode__min {
+  color: var(--k-mod);
+  opacity: 0.75;
+}
+
+/* 主控按钮 */
+.p-controls {
+  display: flex;
+  gap: var(--k-space-2);
+}
+.p-controls .k-btn {
+  min-width: 108px;
+}
+
+/* 时长调整 */
+.p-adjust {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-2);
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+.p-adjust__val {
+  min-width: 44px;
+  text-align: center;
+  font-size: var(--k-text-sm);
+  font-weight: 600;
+  color: var(--k-text-primary);
+}
+
+/* 统计 */
+.p-stats {
+  display: flex;
+  gap: var(--k-space-2);
+}

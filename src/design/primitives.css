@@ -1,0 +1,161 @@
+/* ============================================================
+ * Kairos 基础组件样式：Button / IconButton / Card / Tag / Field
+ * 只引用 semantic token，不含任何业务类名。
+ * ============================================================ */
+
+/* ---- Button ---- */
+.k-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--k-space-1);
+  height: 32px;
+  padding: 0 var(--k-space-3);
+  border-radius: var(--k-radius-sm);
+  font-size: var(--k-text-sm);
+  font-weight: 500;
+  color: var(--k-text-primary);
+  transition: background var(--k-dur-fast) var(--k-ease-standard),
+    color var(--k-dur-fast) var(--k-ease-standard), border-color var(--k-dur-fast) var(--k-ease-standard),
+    box-shadow var(--k-dur-fast) var(--k-ease-standard);
+  white-space: nowrap;
+}
+.k-btn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.k-btn--primary {
+  background: var(--k-mod, var(--k-accent-strong));
+  color: var(--k-text-on-accent);
+  box-shadow: 0 2px 12px -2px var(--k-mod-glow, rgba(0, 0, 0, 0.3));
+}
+.k-btn--primary:hover {
+  filter: brightness(1.12);
+}
+.k-btn--primary:active {
+  filter: brightness(0.95);
+}
+.k-btn--ghost {
+  border: 1px solid var(--k-stroke-hairline);
+}
+.k-btn--ghost:hover {
+  background: var(--k-bg-hover);
+}
+.k-btn--danger {
+  color: var(--k-danger);
+}
+.k-btn--danger:hover {
+  background: var(--k-danger-soft);
+}
+.k-btn--sm {
+  height: 26px;
+  padding: 0 var(--k-space-2);
+  font-size: var(--k-text-xs);
+}
+.k-btn--lg {
+  height: 38px;
+  padding: 0 var(--k-space-5);
+  font-size: var(--k-text-md);
+}
+
+/* ---- IconButton ---- */
+.k-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--k-radius-sm);
+  color: var(--k-text-secondary);
+  transition: background var(--k-dur-fast) var(--k-ease-standard), color var(--k-dur-fast) var(--k-ease-standard);
+}
+.k-icon-btn:hover {
+  background: var(--k-bg-hover);
+  color: var(--k-text-primary);
+}
+
+/* ---- Card（面板容器）：真玻璃质感 ---- */
+.k-card {
+  background: var(--k-bg-card);
+  border: 1px solid var(--k-stroke-hairline);
+  border-radius: var(--k-radius-xl);
+  backdrop-filter: blur(var(--k-glass-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--k-glass-blur)) saturate(1.4);
+  box-shadow:
+    inset 0 1px 0 var(--k-hairline-hi),
+    var(--k-shadow-2);
+  transition: background var(--k-dur-base) var(--k-ease-standard);
+}
+.k-card--hover:hover {
+  background: var(--k-bg-card-hover);
+}
+
+/* ---- Tag ---- */
+.k-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: var(--k-radius-full);
+  font-size: var(--k-text-xs);
+  color: var(--k-text-secondary);
+  background: var(--k-bg-inset-soft);
+  border: 1px solid var(--k-stroke-hairline);
+}
+.k-tag--accent {
+  color: var(--k-mod, var(--k-accent-text));
+  background: var(--k-mod-soft, var(--k-accent-soft));
+  border-color: transparent;
+}
+.k-tag--success {
+  color: var(--k-success);
+  background: var(--k-success-soft);
+  border-color: transparent;
+}
+.k-tag--warning {
+  color: var(--k-warning);
+  background: var(--k-warning-soft);
+  border-color: transparent;
+}
+.k-tag--danger {
+  color: var(--k-danger);
+  background: var(--k-danger-soft);
+  border-color: transparent;
+}
+
+/* ---- Field（输入控件基底） ---- */
+.k-field {
+  width: 100%;
+  background: var(--k-bg-inset);
+  border: 1px solid var(--k-stroke-hairline);
+  border-radius: var(--k-radius-md);
+  color: var(--k-text-primary);
+  padding: 0 var(--k-space-3);
+  height: 32px;
+  outline: none;
+  transition: border-color var(--k-dur-fast) var(--k-ease-standard),
+    box-shadow var(--k-dur-fast) var(--k-ease-standard);
+}
+.k-field::placeholder {
+  color: var(--k-text-faint);
+}
+.k-field:focus {
+  border-color: var(--k-mod-border, var(--k-accent));
+  box-shadow: 0 0 0 3px var(--k-mod-soft, var(--k-accent-soft));
+}
+textarea.k-field {
+  height: auto;
+  min-height: 64px;
+  padding: var(--k-space-2) var(--k-space-3);
+  resize: none;
+  line-height: 1.6;
+}
+
+/* ---- 空态 / 提示 ---- */
+.k-empty {
+  color: var(--k-text-muted);
+  font-size: var(--k-text-sm);
+  text-align: center;
+  padding: var(--k-space-6) var(--k-space-4);
+}

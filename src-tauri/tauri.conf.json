@@ -1,13 +1,13 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Kairos",
-  "version": "0.1.0",
-  "identifier": "com.kairos.app",
+  "version": "0.4.0",
+  "identifier": "com.kairos.desktop",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
-    "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build"
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build"
   },
   "app": {
     "windows": [
@@ -15,12 +15,17 @@
         "title": "Kairos",
         "width": 1180,
         "height": 760,
-        "transparent": true,
+        "minWidth": 940,
+        "minHeight": 620,
         "decorations": false,
         "resizable": true,
         "center": true,
-        "fullscreen": false,
-        "shadow": false
+        "shadow": false,
+        "transparent": true,
+        "windowEffects": {
+          "effects": ["acrylic"],
+          "state": "followsWindowActiveState"
+        }
       }
     ],
     "security": {
@@ -29,16 +34,19 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["nsis"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
-      "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "android": {
-      "debugApplicationIdSuffix": ".debug"
+    "resources": ["resources/LibreHardwareMonitor/*"],
+    "windows": {
+      "nsis": {
+        "languages": ["SimpChinese"],
+        "installMode": "currentUser"
+      }
     }
   }
 }
