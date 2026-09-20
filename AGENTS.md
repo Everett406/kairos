@@ -14,10 +14,26 @@
 
 **文件属地**：以下文件 2026-09-20 由协作方建立，**不要删除、不要覆盖**；确有冲突（比如想换图标）先问用户：
 - `AGENTS.md`（本文件）、`项目建议.md`
-- `docs/branding/`（图标源文件）、`public/favicon.svg`、`src-tauri/icons/`（新 K 字形图标全套）
+- `docs/branding/`（图标源文件）、`public/favicon.svg`、`src-tauri/icons/`（应用图标全套）
 - `index.html` 的 favicon link、`shell.css` 的 `.titlebar__logo` 图标样式
 
 你可以增补自己的约定到本文件，但**保留本节原样**。
+
+## 图标收尾（需在开发机本地执行一次）
+
+新图标的 SVG 源文件与引用接线已入库（`docs/branding/*.svg`、`public/favicon.svg`、`index.html` favicon link、`shell.css` 的 `.titlebar__logo`），但 **PNG/ICO 二进制没法走当时的推送通道**——`src-tauri/icons/` 里可能还是旧图标。接手时执行一次：
+
+```bash
+# 1. 把 kairos-icon-1024.png（透明底 1024×1024，用户手上有，见聊天交付物）放进 docs/branding/
+# 2. 重新生成全套图标（默认写入 src-tauri/icons/）
+pnpm tauri icon docs/branding/kairos-icon-1024.png
+# 3. 若生成了 android/ 或 ios/ 子目录，删掉（本项目只做 Windows）
+# 4. 提交
+git add src-tauri/icons docs/branding/kairos-icon-1024.png
+git commit -m "assets: 新品牌图标全套（透明底）"
+```
+
+注意：`tauri icon` 只接受 PNG 输入（不支持 SVG），SVG 源文件仅作设计留档与 favicon 使用。
 
 ## 这是什么
 
