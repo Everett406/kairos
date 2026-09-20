@@ -22,9 +22,9 @@
 
 ## 1. 当前状态
 
-- **已发布**：v0.3.0（正式，NSIS 安装包 7.5 MB）；v0.3.1 处于 Draft 且**缺便携版 zip**（原因见 §6）。
+- **已发布**：v0.3.0（正式，NSIS 安装包 7.5 MB）；v0.3.1 处于 **Draft，双产物已齐**（安装包 7.5 MB + 便携版 8.8 MB），待人工验收后转正式。
 - **版本一致性**：`package.json` / `src-tauri/tauri.conf.json` / `src-tauri/Cargo.toml` / `src-tauri/Cargo.lock` 四处均为 `0.3.1`，已核对。
-- **CI 运行史**：共 4 次——v0.3.0 两次失败（LHM 资产名 404、wmi API 误用）后修复成功；v0.3.1 败于便携版上传（§6）。
+- **CI 运行史**：v0.3.0 两次失败（LHM 资产名 404、wmi API 误用）后修复成功；v0.3.1 败于便携版上传，已修复（§6）并经 dispatch 重建验证成功。
 - **文档**：README 为产品主页风；本文档负责工程细节与决策记录。
 
 ## 2. 版本纪律（硬约束）
@@ -81,7 +81,7 @@ git push origin rebuild v0.3.x
 - **QQ 音乐 VIP**：免费 128k 无需登录；VIP 需要用户贴 y.qq.com 的 cookie（`uin` + `qm_keyst`），凭据存本机应用数据目录。
 - **翻译**：Google 免费端点，无 key，检测语言与目标一致时自动反向（en↔zh）。
 
-## 6. v0.3.1 发布事故复盘（待修复，修复前勿再打 tag）
+## 6. v0.3.1 发布事故复盘（已修复）
 
 **现象**：tag `v0.3.1` 的 run（[35491202105](https://github.com/Everett406/kairos/actions/runs/35491202105)）failure；Draft v0.3.1 只有 `setup.exe`，缺 `portable.zip`。构建、NSIS 上传、便携包压缩全部成功，失败精确落在最后一步「Upload portable zip to draft release」。
 
@@ -93,12 +93,12 @@ $name = (Get-Content $env:GITHUB_OUTPUT | Where-Object { $_ -like 'name=*' }) -r
 
 但 **`$env:GITHUB_OUTPUT` 是每个 step 独立的临时文件**——上一步「Package portable zip」写入的 `name=...` 在当前步骤里读不到，`$name` 恒为空 → 上传 URL 变成 `?name=`（空）→ GitHub 返回 `422 "Invalid name for request"`（日志原文已核实）。次要因素：打包步骤没有声明 `id:`，即使想用 `steps.<id>.outputs.name` 也无从引用。
 
-**修复预案（二选一，推荐 B）：**
+**修复预案（二选一，已采用 B）：**
 
 - **A. 最小改动**：给打包步骤加 `id: package`，上传步骤改为 `$name = "${{ steps.package.outputs.name }}"`。
-- **B. 直接取本地名（推荐）**：上传步骤里本来就用 `Get-ChildItem -Filter "*portable.zip"` 拿到了文件，把 `$name` 改成 `$zip.Name`，并删掉两步里的 `GITHUB_OUTPUT` 读写——少一个间接层，永不复发。
+- **B. 直接取本地名（已采用，`230fddd`）**：上传步骤里本来就用 `Get-ChildItem -Filter "*portable.zip"` 拿到了文件，把 `$name` 改成 `$zip.Name`，并删掉两步里的 `GITHUB_OUTPUT` 读写——少一个间接层，永不复发。
 
-**补发 v0.3.1 便携版的路径**：修复 workflow 后，手动 `workflow_dispatch` 选 `rebuild` 分支跑一次即可——tauri-action 会按 `tauri.conf.json` 的 `0.3.1` 找到已有 Draft 并复用，便携包随之补齐；不需要删 tag 重打。
+**✅ 已修复并验证（2026-09-20）**：删除旧 Draft（避免 setup.exe 同名冲突）后，`workflow_dispatch`（ref=rebuild）重建，run [35493299085](https://github.com/Everett406/kairos/actions/runs/35493299085) 全绿；新 Draft（id 392332159）同时含 `Kairos_0.3.1_x64-setup.exe`（7.5 MB）与 `Kairos_0.3.1_x64-portable.zip`（8.8 MB）。后续发新版无需再删 Draft。
 
 ## 7. 提交身份规范
 
@@ -155,7 +155,7 @@ node shot.mjs                               # playwright-core 无头截图（脚
 
 ## 12. 后续可做（按优先级）
 
-1. 修复 §6 的 CI 上传 bug 并补发 v0.3.1 便携版（顺手把 v0.3.1 转正式）
+1. v0.3.1 人工验收后转正式（Draft 双产物已齐，见 §6）
 2. UI 舒适度打磨：整体看着舒服、设计合理（进行中议题，待细化）
 3. 亮色主题补齐新 token（`--k-glow-*`、`[data-mod]` 组）
 4. 设置页（主题切换 / 开机自启 / 刷新频率）
