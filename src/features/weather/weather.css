@@ -1,0 +1,375 @@
+/* ============================================================
+ * 天气模块 · 只引用 semantic token
+ * ============================================================ */
+
+/* ---------- 初始 / 定位态 ---------- */
+.w-init {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--k-space-3);
+  color: var(--k-text-muted);
+  text-align: center;
+}
+.w-init p {
+  margin: 0;
+  font-size: var(--k-text-sm);
+}
+
+/* ---------- 城市选择器 ---------- */
+.w-picker {
+  height: 100%;
+  overflow-y: auto;
+}
+.w-picker__row {
+  display: flex;
+  gap: var(--k-space-2);
+  align-items: center;
+  margin-bottom: var(--k-space-3);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--k-bg-base);
+  padding-bottom: var(--k-space-2);
+}
+.w-picker__row .k-field {
+  flex: 1;
+}
+.w-picker__item {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-2);
+  width: 100%;
+  padding: var(--k-space-2) var(--k-space-3);
+  border: 0;
+  border-radius: var(--k-radius-md);
+  background: transparent;
+  color: var(--k-text-secondary);
+  font-size: var(--k-text-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--k-dur-fast) var(--k-ease);
+}
+.w-picker__item:hover {
+  background: var(--k-bg-hover);
+  color: var(--k-text-primary);
+}
+.w-picker__name {
+  color: var(--k-text-primary);
+}
+.w-picker__meta {
+  margin-left: auto;
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+
+/* ---------- 城市栏 ---------- */
+.w-city {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-1);
+  color: var(--k-text-secondary);
+  font-size: var(--k-text-sm);
+  margin-bottom: var(--k-space-3);
+}
+.w-city__btn {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--k-text-muted);
+  font-size: var(--k-text-xs);
+  cursor: pointer;
+  padding: 2px var(--k-space-2);
+  border-radius: var(--k-radius-sm);
+  transition: color var(--k-dur-fast) var(--k-ease), background var(--k-dur-fast) var(--k-ease);
+}
+.w-city__btn:hover {
+  color: var(--k-accent-text);
+  background: var(--k-accent-soft);
+}
+
+/* ---------- 当前天气 ---------- */
+.w-current {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--k-space-3);
+  margin-bottom: var(--k-space-4);
+}
+.w-current__main {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-3);
+  min-width: 0;
+}
+.w-current__icon {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+}
+.w-current__temp {
+  font-size: var(--k-text-3xl);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--k-text-primary);
+}
+.w-current__desc {
+  font-size: var(--k-text-sm);
+  color: var(--k-text-secondary);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.w-current__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+  white-space: nowrap;
+}
+
+/* ---------- 紧凑态 · 未来 4 天 ---------- */
+.w-compact {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.w-days {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--k-space-2);
+}
+.w-days__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--k-space-1);
+  padding: var(--k-space-2) 0;
+  border-radius: var(--k-radius-md);
+  background: var(--k-bg-inset);
+  transition: background var(--k-dur-fast) var(--k-ease);
+}
+.w-days__item:hover {
+  background: var(--k-bg-hover);
+}
+.w-days__item img {
+  width: 30px;
+  height: 30px;
+}
+.w-days__label {
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+.w-days__temp {
+  font-size: var(--k-text-xs);
+  color: var(--k-text-secondary);
+}
+.w-days__temp em {
+  font-style: normal;
+  color: var(--k-text-muted);
+}
+
+/* ---------- 展开态 ---------- */
+.w-detail {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space-3);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+/* 概览 2×2 */
+.w-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--k-space-2);
+}
+.w-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-2);
+  padding: var(--k-space-2) var(--k-space-3);
+  border-radius: var(--k-radius-md);
+  background: var(--k-bg-inset);
+  color: var(--k-text-muted);
+  font-size: var(--k-text-xs);
+}
+.w-cell b {
+  margin-left: auto;
+  font-weight: 500;
+  font-size: var(--k-text-sm);
+  color: var(--k-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 穿衣 / 出行建议 */
+.w-advice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--k-space-2);
+  padding: var(--k-space-2) var(--k-space-3);
+  border-radius: var(--k-radius-md);
+  background: var(--k-accent-soft);
+  color: var(--k-accent-text);
+  font-size: var(--k-text-xs);
+  line-height: 1.5;
+}
+.w-advice svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* 日出日落 */
+.w-sun {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-3);
+  flex-wrap: wrap;
+  font-size: var(--k-text-xs);
+  color: var(--k-text-secondary);
+}
+.w-sun__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-space-1);
+}
+
+/* AQI */
+.w-aqi {
+  padding: var(--k-space-2) var(--k-space-3);
+  border-radius: var(--k-radius-md);
+  background: var(--k-bg-inset);
+}
+.w-aqi__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--k-text-xs);
+  color: var(--k-text-secondary);
+  margin-bottom: var(--k-space-1);
+}
+.w-aqi__body {
+  display: flex;
+  gap: var(--k-space-3);
+  flex-wrap: wrap;
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+.w-aqi__body b {
+  font-weight: 500;
+  color: var(--k-text-primary);
+}
+
+/* 小节标题 */
+.w-section h4 {
+  margin: 0 0 var(--k-space-2);
+  font-size: var(--k-text-xs);
+  font-weight: 500;
+  color: var(--k-text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* 未来 24h 降水柱 */
+.w-rain24 {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: 3px;
+  align-items: end;
+}
+.w-rain24__col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.w-rain24__bar {
+  height: 44px;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  border-radius: 3px;
+  background: var(--k-bg-inset);
+  overflow: hidden;
+}
+.w-rain24__bar i {
+  display: block;
+  width: 100%;
+  border-radius: 3px 3px 0 0;
+  background: var(--k-accent);
+  opacity: 0.75;
+  transition: height var(--k-dur-slow) var(--k-ease);
+}
+.w-rain24__hour {
+  font-size: 10px;
+  color: var(--k-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 15 日预报 */
+.w-fifteen {
+  display: flex;
+  flex-direction: column;
+}
+.w-fifteen__row {
+  display: grid;
+  grid-template-columns: 44px 28px 1fr 40px 150px;
+  align-items: center;
+  gap: var(--k-space-2);
+  padding: var(--k-space-1) var(--k-space-2);
+  border-radius: var(--k-radius-sm);
+  font-size: var(--k-text-xs);
+  color: var(--k-text-secondary);
+  transition: background var(--k-dur-fast) var(--k-ease);
+}
+.w-fifteen__row:hover {
+  background: var(--k-bg-hover);
+}
+.w-fifteen__day {
+  color: var(--k-text-primary);
+  white-space: nowrap;
+}
+.w-fifteen__row img {
+  width: 22px;
+  height: 22px;
+  justify-self: center;
+}
+.w-fifteen__desc {
+  color: var(--k-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.w-fifteen__pop {
+  text-align: right;
+  color: var(--k-accent-text);
+}
+.w-fifteen__temp {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-space-2);
+  justify-self: end;
+  color: var(--k-text-secondary);
+}
+.w-fifteen__temp i {
+  display: inline-block;
+  width: 34px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--k-bg-inset);
+  overflow: hidden;
+}
+.w-fifteen__temp i b {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--k-blue-500), var(--k-blue-300));
+}

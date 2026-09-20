@@ -1,0 +1,79 @@
+/* ============================================================
+ * Kairos 全局基础样式：reset / 字体 / 滚动条 / 窗口背景
+ * ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--k-font-ui);
+  font-size: var(--k-text-md);
+  line-height: 1.5;
+  color: var(--k-text-primary);
+  background:
+    radial-gradient(1100px 700px at 18% -12%, var(--k-bg-glow), transparent 62%),
+    radial-gradient(900px 620px at 96% 112%, var(--k-bg-glow), transparent 58%),
+    var(--k-bg-base);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: default;
+}
+
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+  user-select: text;
+  cursor: text;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* 数字一律等宽对齐（计时 / 速率 / 表格） */
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 通用滚动条：细、安静 */
+.k-scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--k-stroke-strong) transparent;
+}
+.k-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.k-scroll::-webkit-scrollbar-thumb {
+  background: var(--k-stroke-subtle);
+  border-radius: var(--k-radius-full);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.k-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--k-stroke-strong);
+  background-clip: content-box;
+}
+
+/* 标题字体 */
+.k-display {
+  font-family: var(--k-font-display);
+  letter-spacing: -0.01em;
+}

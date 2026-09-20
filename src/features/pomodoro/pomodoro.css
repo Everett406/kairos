@@ -1,0 +1,179 @@
+/* ============================================================
+ * 番茄钟模块 · 只引用 semantic token
+ * ============================================================ */
+
+/* ---------- 计时盘（compact / expanded 共用） ---------- */
+.p-dial {
+  position: relative;
+  width: 108px;
+  height: 108px;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+.p-dial svg {
+  width: 100%;
+  height: 100%;
+}
+.p-dial__track {
+  fill: none;
+  stroke: var(--k-bg-inset);
+  stroke-width: 6;
+}
+.p-dial__fill {
+  fill: none;
+  stroke: var(--k-accent);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s linear;
+}
+.is-running .p-dial__fill {
+  stroke: var(--k-accent-strong);
+}
+.p-dial__inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.p-dial__time {
+  font-size: var(--k-text-lg);
+  font-weight: 600;
+  color: var(--k-text-primary);
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.p-dial__mode {
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+
+/* ---------- 紧凑态 ---------- */
+.p-compact {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space-3);
+}
+.p-compact__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.p-today {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-space-1);
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+.p-compact__btns {
+  display: inline-flex;
+  gap: var(--k-space-1);
+}
+
+/* 圆形图标按钮 */
+.p-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--k-stroke-subtle);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--k-text-secondary);
+  cursor: pointer;
+  transition: background var(--k-dur-fast) var(--k-ease), color var(--k-dur-fast) var(--k-ease),
+    border-color var(--k-dur-fast) var(--k-ease);
+}
+.p-icon-btn:hover:not(:disabled) {
+  background: var(--k-accent-soft);
+  color: var(--k-accent-text);
+  border-color: transparent;
+}
+.p-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ---------- 展开态 ---------- */
+.p-detail {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--k-space-4);
+  overflow-y: auto;
+  padding-top: var(--k-space-2);
+}
+.p-detail .p-dial {
+  width: 168px;
+  height: 168px;
+}
+.p-detail .p-dial__time {
+  font-size: var(--k-text-3xl);
+}
+.p-detail .p-dial__mode {
+  font-size: var(--k-text-sm);
+}
+
+.p-modes {
+  display: flex;
+  gap: var(--k-space-1);
+  padding: 3px;
+  border-radius: var(--k-radius-lg);
+  background: var(--k-bg-inset);
+}
+.p-mode {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--k-space-1) var(--k-space-3);
+  border: 0;
+  border-radius: var(--k-radius-md);
+  background: transparent;
+  color: var(--k-text-muted);
+  font-size: var(--k-text-xs);
+  cursor: pointer;
+  transition: background var(--k-dur-fast) var(--k-ease), color var(--k-dur-fast) var(--k-ease);
+}
+.p-mode:hover {
+  color: var(--k-text-secondary);
+}
+.p-mode.is-active {
+  background: var(--k-bg-card-hover);
+  color: var(--k-text-primary);
+}
+.p-mode__min {
+  font-size: 10px;
+  color: var(--k-text-muted);
+}
+
+.p-controls {
+  display: flex;
+  gap: var(--k-space-2);
+}
+
+.p-adjust {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-2);
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+.p-adjust__val {
+  min-width: 52px;
+  text-align: center;
+  color: var(--k-text-primary);
+  font-size: var(--k-text-sm);
+}
+
+.p-stats {
+  margin-top: auto;
+  display: flex;
+  gap: var(--k-space-2);
+  padding-bottom: var(--k-space-2);
+}

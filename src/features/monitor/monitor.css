@@ -1,0 +1,221 @@
+/* ============================================================
+ * 系统监控模块 · 只引用 semantic token
+ * ============================================================ */
+
+.m-init {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--k-text-muted);
+  font-size: var(--k-text-sm);
+}
+
+/* ---------- 紧凑态 ---------- */
+.m-compact {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space-2);
+}
+.m-compact__top {
+  display: flex;
+  align-items: baseline;
+  gap: var(--k-space-2);
+}
+.m-compact__cpu {
+  font-size: var(--k-text-3xl);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--k-text-primary);
+}
+.m-compact__cpu small {
+  font-size: var(--k-text-sm);
+  font-weight: 400;
+  color: var(--k-text-muted);
+  margin-left: 1px;
+}
+.m-compact__label {
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+.m-compact__right {
+  margin-left: auto;
+  font-size: var(--k-text-sm);
+}
+
+.m-compact__mem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.m-compact__mem-text {
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+
+.m-compact__meta {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--k-space-2);
+  font-size: var(--k-text-xs);
+  color: var(--k-text-secondary);
+}
+.m-net {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.m-net svg {
+  color: var(--k-text-muted);
+}
+
+/* ---------- 通用条 ---------- */
+.m-bar {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--k-bg-inset);
+  overflow: hidden;
+}
+.m-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--k-accent);
+  transition: width var(--k-dur-slow) var(--k-ease), background var(--k-dur-slow) var(--k-ease);
+}
+.m-bar i[style] {
+  background: var(--k-accent);
+}
+
+/* ---------- 展开态 ---------- */
+.m-detail {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space-3);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.m-cpu-name {
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+  letter-spacing: 0.01em;
+}
+
+.m-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--k-space-2);
+}
+.m-cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space-2);
+  padding: var(--k-space-3);
+  border-radius: var(--k-radius-md);
+  background: var(--k-bg-inset);
+}
+.m-cell__head {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-1);
+  font-size: var(--k-text-xs);
+  color: var(--k-text-secondary);
+}
+.m-cell__head svg {
+  color: var(--k-text-muted);
+}
+.m-cell__head b {
+  margin-left: auto;
+  font-weight: 500;
+  font-size: var(--k-text-sm);
+  color: var(--k-text-primary);
+}
+.m-none {
+  color: var(--k-text-muted);
+  font-weight: 400;
+}
+.m-cell__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-3);
+  flex-wrap: wrap;
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+
+.m-net-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space-1);
+  font-size: var(--k-text-sm);
+  color: var(--k-text-primary);
+  padding: var(--k-space-1) 0;
+}
+.m-net-rows svg {
+  color: var(--k-text-muted);
+  margin-right: 4px;
+  vertical-align: -1px;
+}
+
+/* 磁盘区 */
+.m-section h4 {
+  margin: 0 0 var(--k-space-2);
+  font-size: var(--k-text-xs);
+  font-weight: 500;
+  color: var(--k-text-muted);
+  letter-spacing: 0.02em;
+}
+.m-disk {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--k-space-2) 0;
+}
+.m-disk__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--k-space-2);
+  font-size: var(--k-text-xs);
+}
+.m-disk__model {
+  color: var(--k-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.m-disk__letters {
+  color: var(--k-text-secondary);
+  flex-shrink: 0;
+}
+.m-disk__busy {
+  margin-left: auto;
+  color: var(--k-text-muted);
+  flex-shrink: 0;
+}
+.m-disk__meta {
+  font-size: 10px;
+  color: var(--k-text-muted);
+}
+
+/* 提权提示 */
+.m-elevate {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-2);
+  margin-top: auto;
+  padding: var(--k-space-2) var(--k-space-3);
+  border-radius: var(--k-radius-md);
+  background: var(--k-accent-soft);
+  color: var(--k-accent-text);
+  font-size: var(--k-text-xs);
+}
+.m-elevate svg {
+  flex-shrink: 0;
+}
+.m-elevate span {
+  flex: 1;
+}

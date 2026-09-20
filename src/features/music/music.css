@@ -1,0 +1,420 @@
+/* ============================================================
+ * 音乐模块 · 只引用 semantic token
+ * ============================================================ */
+
+/* ---------- 卡头角标 ---------- */
+.mu-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 180px;
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+.mu-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--k-accent);
+  animation: mu-pulse 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes mu-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+.mu-badge__text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 封面 ---------- */
+.mu-cover {
+  border-radius: var(--k-radius-md);
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--k-bg-inset);
+}
+.mu-cover--ph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--k-text-muted);
+}
+
+/* ---------- 均衡器 ---------- */
+.mu-eq {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.35;
+  transition: opacity var(--k-dur-fast) var(--k-ease);
+}
+.mu-eq.is-on {
+  opacity: 1;
+}
+.mu-eq i {
+  width: 3px;
+  border-radius: 1px;
+  background: var(--k-accent);
+  height: 30%;
+}
+.mu-eq.is-on i {
+  animation: mu-eq-b 1s ease-in-out infinite;
+}
+.mu-eq.is-on i:nth-child(2) { animation-delay: 0.2s; }
+.mu-eq.is-on i:nth-child(3) { animation-delay: 0.45s; }
+@keyframes mu-eq-b {
+  0%, 100% { height: 25%; }
+  50% { height: 100%; }
+}
+
+/* ---------- 紧凑态 ---------- */
+.mu-compact {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.mu-compact--idle {
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--k-space-2);
+  color: var(--k-text-muted);
+}
+.mu-compact--idle p {
+  margin: 0;
+  font-size: var(--k-text-xs);
+}
+.mu-compact__main {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-3);
+  width: 100%;
+  cursor: pointer;
+}
+.mu-compact__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mu-compact__name {
+  font-size: var(--k-text-sm);
+  color: var(--k-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mu-compact__singer {
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 展开态骨架 ---------- */
+.mu-detail {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space-3);
+}
+.mu-cols {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: var(--k-space-4);
+}
+
+/* 登录条 */
+.mu-login {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-2);
+  flex-wrap: wrap;
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+  min-height: 26px;
+}
+.mu-login__hint {
+  flex: 1;
+}
+.mu-login__uin {
+  color: var(--k-text-secondary);
+}
+.mu-login__out {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: 0;
+  background: transparent;
+  color: var(--k-accent-text);
+  font-size: var(--k-text-xs);
+  cursor: pointer;
+  padding: 2px var(--k-space-1);
+  border-radius: var(--k-radius-sm);
+  flex-shrink: 0;
+}
+.mu-login__out:hover {
+  background: var(--k-accent-soft);
+}
+.mu-login__form {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-1);
+  width: 100%;
+}
+.mu-login__input {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--k-text-xs);
+  padding: 5px var(--k-space-2);
+}
+.mu-login__err {
+  width: 100%;
+  color: var(--k-danger);
+}
+
+/* 搜索框 */
+.mu-search {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-2);
+  margin: var(--k-space-2) 0;
+  padding: var(--k-space-2) var(--k-space-3);
+  border-radius: var(--k-radius-md);
+  background: var(--k-bg-inset);
+  color: var(--k-text-muted);
+}
+.mu-search__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  color: var(--k-text-primary);
+  font-size: var(--k-text-sm);
+}
+.mu-search__input::placeholder {
+  color: var(--k-text-muted);
+}
+.mu-search__spin {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--k-stroke-subtle);
+  border-top-color: var(--k-accent);
+  animation: mu-rot 0.8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes mu-rot {
+  to { transform: rotate(360deg); }
+}
+
+/* 结果列表 */
+.mu-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.mu-list__row {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-2);
+  padding: var(--k-space-2) var(--k-space-2);
+  border-radius: var(--k-radius-sm);
+  font-size: var(--k-text-xs);
+  cursor: pointer;
+  transition: background var(--k-dur-fast) var(--k-ease);
+}
+.mu-list__row:hover {
+  background: var(--k-bg-hover);
+}
+.mu-list__row.is-active {
+  background: var(--k-accent-soft);
+}
+.mu-list__idx {
+  width: 20px;
+  text-align: center;
+  color: var(--k-text-muted);
+  flex-shrink: 0;
+}
+.mu-list__row.is-active .mu-list__idx {
+  color: var(--k-accent-text);
+}
+.mu-list__name {
+  color: var(--k-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+}
+.mu-list__singer {
+  color: var(--k-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  text-align: right;
+}
+.mu-list__dur {
+  color: var(--k-text-muted);
+  flex-shrink: 0;
+}
+
+/* 歌词 */
+.mu-right {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--k-stroke-hairline);
+  padding-left: var(--k-space-4);
+}
+.mu-lyrics {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--k-space-2) 0;
+}
+.mu-lyrics--hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--k-text-muted);
+  font-size: var(--k-text-xs);
+}
+.mu-lyrics__line {
+  margin: 0;
+  padding: var(--k-space-1) 0;
+  font-size: var(--k-text-sm);
+  line-height: 1.6;
+  color: var(--k-text-muted);
+  transition: color var(--k-dur-fast) var(--k-ease);
+}
+.mu-lyrics__line.is-active {
+  color: var(--k-text-primary);
+  font-weight: 500;
+}
+
+/* ---------- 播放条 ---------- */
+.mu-playbar {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-3);
+  padding: var(--k-space-2) var(--k-space-3);
+  border-radius: var(--k-radius-lg);
+  background: var(--k-bg-inset);
+}
+.mu-playbar__info {
+  width: 170px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex-shrink: 0;
+}
+.mu-playbar__name {
+  font-size: var(--k-text-xs);
+  color: var(--k-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mu-playbar__singer {
+  font-size: 10px;
+  color: var(--k-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mu-playbar__err {
+  font-size: 10px;
+  color: var(--k-danger);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mu-playbar__seek {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-2);
+  min-width: 0;
+}
+.mu-playbar__time {
+  font-size: 10px;
+  color: var(--k-text-muted);
+  flex-shrink: 0;
+}
+.mu-range {
+  flex: 1;
+  min-width: 0;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--k-stroke-subtle);
+  outline: none;
+  cursor: pointer;
+}
+.mu-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--k-accent);
+  border: none;
+  transition: transform var(--k-dur-fast) var(--k-ease);
+}
+.mu-range::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+.mu-range:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.mu-playbar__btns {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-1);
+  flex-shrink: 0;
+}
+.mu-ctl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--k-text-secondary);
+  cursor: pointer;
+  transition: background var(--k-dur-fast) var(--k-ease), color var(--k-dur-fast) var(--k-ease);
+}
+.mu-ctl:hover:not(:disabled) {
+  background: var(--k-bg-hover);
+  color: var(--k-text-primary);
+}
+.mu-ctl:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.mu-ctl--main {
+  width: 36px;
+  height: 36px;
+  background: var(--k-accent);
+  color: var(--k-text-on-accent);
+}
+.mu-ctl--main:hover:not(:disabled) {
+  background: var(--k-accent-strong);
+  color: var(--k-text-on-accent);
+}

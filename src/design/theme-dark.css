@@ -1,0 +1,48 @@
+/* ============================================================
+ * Kairos Semantic 层 · 暗色主题（默认）
+ * 只表达界面语义；换肤 = 新增一份同结构映射文件。
+ * 组件样式只允许引用本层变量。
+ * ============================================================ */
+
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* ---- 表面 ---- */
+  --k-bg-base: var(--k-gray-950);           /* 窗口底 */
+  --k-bg-glow: rgba(59, 110, 245, 0.09);    /* 背景氛围光 */
+  --k-bg-card: rgba(255, 255, 255, 0.045);  /* 卡片面 */
+  --k-bg-card-hover: rgba(255, 255, 255, 0.075);
+  --k-bg-inset: rgba(0, 0, 0, 0.28);        /* 输入框 / 凹陷区 */
+  --k-bg-elevated: var(--k-gray-850);       /* 弹层 / 浮出 */
+  --k-bg-hover: rgba(255, 255, 255, 0.06);  /* 通用悬停 */
+
+  /* ---- 文字 ---- */
+  --k-text-primary: #e9ebef;
+  --k-text-secondary: rgba(233, 235, 239, 0.66);
+  --k-text-muted: rgba(233, 235, 239, 0.4);
+  --k-text-on-accent: #ffffff;
+
+  /* ---- 描边 ---- */
+  --k-stroke-hairline: rgba(255, 255, 255, 0.07);  /* 卡片描边 */
+  --k-stroke-subtle: rgba(255, 255, 255, 0.14);    /* 输入框 / 分隔 */
+  --k-stroke-strong: rgba(255, 255, 255, 0.26);
+
+  /* ---- 品牌 / 状态 ---- */
+  --k-accent: var(--k-blue-400);
+  --k-accent-strong: var(--k-blue-500);
+  --k-accent-soft: rgba(96, 145, 250, 0.16);
+  --k-accent-text: var(--k-blue-300);
+  --k-success: #53d18a;
+  --k-success-soft: rgba(83, 209, 138, 0.14);
+  --k-warning: #f2b63d;
+  --k-warning-soft: rgba(242, 182, 61, 0.14);
+  --k-danger: #f4726d;
+  --k-danger-soft: rgba(244, 114, 109, 0.14);
+
+  /* ---- 玻璃参数（换肤入口） ---- */
+  --k-glass-blur: 18px;
+  --k-glass-alpha: 0.72;
+  --k-glass-tint: 255, 255, 255;
+  --k-glass-tint-alpha: 0.04;
+}

@@ -1,0 +1,63 @@
+name: Release
+
+# 推送 v* tag 或手动触发：构建 Windows NSIS 安装包并发布 Draft Release
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      # LibreHardwareMonitor 不入库，构建时随包填充 resources/
+      - name: Download LibreHardwareMonitor
+        shell: pwsh
+        run: |
+          $dest = "src-tauri/resources/LibreHardwareMonitor"
+          New-Item -ItemType Directory -Force -Path $dest | Out-Null
+          Invoke-WebRequest `
+            -Uri "https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases/latest/download/LibreHardwareMonitor-net472.zip" `
+            -OutFile "lhm.zip"
+          Expand-Archive -Path "lhm.zip" -DestinationPath $dest -Force
+          Remove-Item "lhm.zip"
+          Get-ChildItem $dest | Select-Object Name
+
+      - name: Install frontend deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Build & upload to release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: 'Kairos v__VERSION__'
+          releaseBody: 'Windows 安装包（NSIS）。系统监控的温度 / 风扇 / 磁盘详情需以管理员身份运行。'
+          releaseDraft: true
+          prerelease: false

@@ -1,0 +1,144 @@
+/* ============================================================
+ * Kairos 基础组件样式：Button / IconButton / Card / Tag / Field
+ * 只引用 semantic token，不含任何业务类名。
+ * ============================================================ */
+
+/* ---- Button ---- */
+.k-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--k-space-1);
+  height: 32px;
+  padding: 0 var(--k-space-3);
+  border-radius: var(--k-radius-sm);
+  font-size: var(--k-text-sm);
+  font-weight: 500;
+  color: var(--k-text-primary);
+  transition: background var(--k-dur-fast) var(--k-ease-standard),
+    color var(--k-dur-fast) var(--k-ease-standard), border-color var(--k-dur-fast) var(--k-ease-standard);
+  white-space: nowrap;
+}
+.k-btn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.k-btn--primary {
+  background: var(--k-accent-strong);
+  color: var(--k-text-on-accent);
+}
+.k-btn--primary:hover {
+  background: var(--k-accent);
+}
+.k-btn--ghost:hover {
+  background: var(--k-bg-hover);
+}
+.k-btn--danger {
+  color: var(--k-danger);
+}
+.k-btn--danger:hover {
+  background: var(--k-danger-soft);
+}
+.k-btn--sm {
+  height: 26px;
+  padding: 0 var(--k-space-2);
+  font-size: var(--k-text-xs);
+}
+.k-btn--lg {
+  height: 38px;
+  padding: 0 var(--k-space-5);
+  font-size: var(--k-text-md);
+}
+
+/* ---- IconButton ---- */
+.k-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--k-radius-sm);
+  color: var(--k-text-secondary);
+  transition: background var(--k-dur-fast) var(--k-ease-standard), color var(--k-dur-fast) var(--k-ease-standard);
+}
+.k-icon-btn:hover {
+  background: var(--k-bg-hover);
+  color: var(--k-text-primary);
+}
+
+/* ---- Card（面板容器） ---- */
+.k-card {
+  background: var(--k-bg-card);
+  border: 1px solid var(--k-stroke-hairline);
+  border-radius: var(--k-radius-lg);
+  backdrop-filter: blur(var(--k-glass-blur)) saturate(1.15);
+  -webkit-backdrop-filter: blur(var(--k-glass-blur)) saturate(1.15);
+  box-shadow: var(--k-shadow-1);
+  transition: background var(--k-dur-base) var(--k-ease-standard);
+}
+.k-card--hover:hover {
+  background: var(--k-bg-card-hover);
+}
+
+/* ---- Tag ---- */
+.k-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: var(--k-radius-full);
+  font-size: var(--k-text-xs);
+  color: var(--k-text-secondary);
+  background: var(--k-bg-inset);
+}
+.k-tag--accent {
+  color: var(--k-accent-text);
+  background: var(--k-accent-soft);
+}
+.k-tag--success {
+  color: var(--k-success);
+  background: var(--k-success-soft);
+}
+.k-tag--warning {
+  color: var(--k-warning);
+  background: var(--k-warning-soft);
+}
+.k-tag--danger {
+  color: var(--k-danger);
+  background: var(--k-danger-soft);
+}
+
+/* ---- Field（输入控件基底） ---- */
+.k-field {
+  width: 100%;
+  background: var(--k-bg-inset);
+  border: 1px solid transparent;
+  border-radius: var(--k-radius-sm);
+  color: var(--k-text-primary);
+  padding: 0 var(--k-space-3);
+  height: 32px;
+  outline: none;
+  transition: border-color var(--k-dur-fast) var(--k-ease-standard);
+}
+.k-field::placeholder {
+  color: var(--k-text-muted);
+}
+.k-field:focus {
+  border-color: var(--k-accent);
+}
+textarea.k-field {
+  height: auto;
+  min-height: 64px;
+  padding: var(--k-space-2) var(--k-space-3);
+  resize: none;
+  line-height: 1.6;
+}
+
+/* ---- 空态 / 提示 ---- */
+.k-empty {
+  color: var(--k-text-muted);
+  font-size: var(--k-text-sm);
+  text-align: center;
+  padding: var(--k-space-6) var(--k-space-4);
+}

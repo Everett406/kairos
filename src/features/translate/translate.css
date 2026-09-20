@@ -1,0 +1,111 @@
+/* ============================================================
+ * 翻译模块 · 只引用 semantic token
+ * ============================================================ */
+
+.t-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space-2);
+  min-height: 0;
+}
+
+/* 输入区 */
+.t-source {
+  flex: 1;
+  min-height: 0;
+}
+.t-area {
+  width: 100%;
+  height: 100%;
+  min-height: 64px;
+  resize: none;
+  font-size: var(--k-text-sm);
+  line-height: 1.6;
+}
+
+/* 中部：语言 + 状态 */
+.t-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--k-space-2);
+}
+.t-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-space-1);
+  color: var(--k-text-muted);
+}
+.t-select {
+  border: 0;
+  background: transparent;
+  color: var(--k-text-secondary);
+  font-size: var(--k-text-xs);
+  cursor: pointer;
+  outline: none;
+}
+.t-select option {
+  background: var(--k-bg-elevated);
+  color: var(--k-text-primary);
+}
+.t-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+}
+.t-spin {
+  color: var(--k-text-muted);
+  animation: t-rotate 1s linear infinite;
+}
+@keyframes t-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 结果区 */
+.t-result {
+  flex: 1;
+  min-height: 64px;
+  position: relative;
+  padding: var(--k-space-2) var(--k-space-3);
+  border-radius: var(--k-radius-md);
+  background: var(--k-bg-inset);
+  opacity: 0.65;
+  transition: opacity var(--k-dur-fast) var(--k-ease);
+}
+.t-result.is-on {
+  opacity: 1;
+}
+.t-text {
+  margin: 0;
+  font-size: var(--k-text-sm);
+  line-height: 1.65;
+  color: var(--k-text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.t-placeholder {
+  margin: 0;
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
+.t-error {
+  margin: 0;
+  font-size: var(--k-text-xs);
+  color: var(--k-danger);
+}
+.t-copy {
+  position: absolute;
+  right: var(--k-space-2);
+  bottom: var(--k-space-2);
+}
+
+/* 紧凑态压缩留白 */
+.is-compact .t-area {
+  min-height: 48px;
+}
+.is-compact .t-result {
+  min-height: 48px;
+}

@@ -1,0 +1,155 @@
+/* ============================================================
+ * 剪贴板模块 · 只引用 semantic token
+ * ============================================================ */
+
+.c-init,
+.c-empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--k-text-muted);
+  font-size: var(--k-text-sm);
+  text-align: center;
+}
+
+.c-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space-2);
+}
+
+.c-list {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ---------- 行 ---------- */
+.c-row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--k-space-2);
+  padding: var(--k-space-2) var(--k-space-2);
+  border-radius: var(--k-radius-md);
+  cursor: pointer;
+  transition: background var(--k-dur-fast) var(--k-ease);
+}
+.c-row:hover {
+  background: var(--k-bg-hover);
+}
+
+.c-row__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--k-radius-sm);
+  background: var(--k-bg-inset);
+  color: var(--k-text-muted);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.c-row__icon.is-link {
+  color: var(--k-accent-text);
+  background: var(--k-accent-soft);
+}
+
+.c-row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.c-row__text {
+  font-size: var(--k-text-xs);
+  color: var(--k-text-secondary);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  word-break: break-all;
+}
+.c-row__link {
+  font-size: var(--k-text-xs);
+  color: var(--k-accent-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.c-row__time {
+  font-size: 10px;
+  color: var(--k-text-muted);
+}
+
+/* 复制成功标记 */
+.c-row__copied {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px var(--k-space-2);
+  border-radius: var(--k-radius-sm);
+  background: var(--k-success-soft);
+  color: var(--k-success);
+  font-size: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--k-dur-fast) var(--k-ease);
+}
+.c-row__copied.is-on {
+  opacity: 1;
+}
+
+.c-row__del {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: var(--k-radius-sm);
+  background: transparent;
+  color: var(--k-text-muted);
+  opacity: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity var(--k-dur-fast) var(--k-ease), color var(--k-dur-fast) var(--k-ease),
+    background var(--k-dur-fast) var(--k-ease);
+}
+.c-row:hover .c-row__del {
+  opacity: 1;
+}
+.c-row__del:hover {
+  color: var(--k-danger);
+  background: var(--k-danger-soft);
+}
+
+/* ---------- 紧凑态尾部 ---------- */
+.c-more {
+  font-size: 10px;
+  color: var(--k-text-muted);
+  text-align: center;
+  padding: 2px 0;
+}
+
+/* ---------- 展开态底部 ---------- */
+.c-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--k-space-2);
+  border-top: 1px solid var(--k-stroke-hairline);
+  font-size: var(--k-text-xs);
+  color: var(--k-text-muted);
+}
