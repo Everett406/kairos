@@ -8,6 +8,8 @@ export interface ClipItem {
   text: string
   /** 毫秒时间戳 */
   at: number
+  /** 置顶收藏（旧历史记录无此字段） */
+  pin?: boolean
 }
 
 export function clipboardList(): Promise<ClipItem[]> {

@@ -9,7 +9,6 @@ import type { ClipItem } from '../features/clipboard/api'
 import type { LocalTrack, LyricsPayload, NeSong, QqSong } from '../features/music/api'
 import type { Stats } from '../features/monitor/model'
 import type { ActivitySeg } from '../features/activity/api'
-import type { KairosSettings } from './settings'
 
 const now = new Date()
 const pad = (n: number) => String(n).padStart(2, '0')
