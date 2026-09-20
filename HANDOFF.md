@@ -34,6 +34,8 @@
 
 > **用户纪律（2026-09-20）**：每轮开发结束后，必须同步更新 **README.md、HANDOFF.md、docs/screenshots/** 三件套，然后才提交推送。仓库主页（main）的 README 与截图就是产品的脸面——代码改了而文档没跟上，等于这轮没做完。
 
+> **并发协作（2026-09-20 起）**：rebuild 上可能已有其他协作者的提交（AGENTS.md / 项目建议.md / 新图标全套等）。**推送被拒（non-fast-forward）时先 `git pull --rebase origin rebuild`，保留双方改动后再推，严禁 force push**；冲突时新增文件全留、共享文件两边编辑都保留。完整协议见 AGENTS.md 顶部「并发协作协议」。
+
 按序六步：
 
 **① 版本号**（若本轮发版）：按 §3 纪律**只动末位**，四处同步，并用 §3 的自检命令核对输出一致。
@@ -65,7 +67,7 @@ pnpm dev          # 起 Vite（5173）；mock 层自动生效，纯浏览器可�
 
 **④ 更新 HANDOFF.md（本文档）**：§0 沿革表加一行；§1 当前状态改写；本轮新踩的坑记入 §6 已知坑；§12 后续可做增删。
 
-**⑤ 提交推送**：Everett406 署名（见 §8），在 rebuild 分支提交；随后把 rebuild 合并进 main——`git checkout main && git merge rebuild -X theirs`（冲突一律取 rebuild 侧）再推送，保证主页最新。
+**⑤ 提交推送**：Everett406 署名（见 §8），在 rebuild 分支提交；随后把 rebuild 合并进 main——`git checkout main && git merge rebuild -X theirs`（冲突一律取 rebuild 侧）再推送，保证主页最新。**若 push 被拒说明有并发提交：`git pull --rebase origin rebuild` 后再推，严禁强推**（见 §2 开头并发协作提示）。
 
 **⑥ 发布**（若本轮发版）：按 §4 流程打 tag → CI 构建 → Draft Release 补 Release Notes → **停在草稿，等用户验收批准后才转正式**。
 
