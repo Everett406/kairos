@@ -517,3 +517,54 @@
   color: var(--k-mod);
   filter: brightness(1.15);
 }
+
+/* ---- v0.4.1：源栏 / VIP 标 / 列表封面 ---- */
+.mu-sourcebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2px 2px 8px;
+  min-height: 30px;
+}
+.mu-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--k-text-secondary);
+}
+.mu-localbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.mu-localbar .mu-login__hint {
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mu-viptag {
+  font-style: normal;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--k-warm);
+  border: 1px solid var(--k-warm-border);
+  background: var(--k-warm-soft);
+  border-radius: 4px;
+  padding: 0 4px;
+  margin-left: 6px;
+  vertical-align: 1px;
+}
+.mu-list__row .mu-cover {
+  border-radius: 6px;
+  flex: none;
+}
+.mu-list__row .mu-cover--ph svg {
+  color: var(--k-text-faint);
+}

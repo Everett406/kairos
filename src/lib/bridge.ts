@@ -3,7 +3,7 @@
  * 前端所有与 Rust 的通信只允许经过本文件。
  */
 
-import { invoke as tauriInvoke } from '@tauri-apps/api/core'
+import { invoke as tauriInvoke, convertFileSrc } from '@tauri-apps/api/core'
 import { listen as tauriListen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification'
@@ -25,6 +25,12 @@ export function listen<T = unknown>(event: string, handler: (payload: T) => void
 export const appWindow = {
   minimize: () => getCurrentWindow().minimize(),
   close: () => getCurrentWindow().close(),
+}
+
+/** 本地文件 → WebView 可访问的 asset 协议 URL（浏览器环境返回空串） */
+export function fileSrc(path: string): string {
+  if (!IS_TAURI || !path) return ''
+  return convertFileSrc(path)
 }
 
 export async function notify(title: string, body: string) {

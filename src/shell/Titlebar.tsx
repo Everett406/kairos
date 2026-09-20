@@ -1,22 +1,24 @@
-import { Grip, Minus, X, Search } from 'lucide-react'
+import { Grip, Minus, X, Search, Settings2 } from 'lucide-react'
 import { appWindow } from '../lib/bridge'
 import { useWeather } from '../features/weather/useWeather'
 import { wmo } from '../features/weather/model'
 import { weatherIcon } from '../features/weather/api'
 
 /**
- * v4 无边框标题栏：品牌 · 天气 chip · 命令条 chip · 九宫格入口 · 窗控。
+ * v4 无边框标题栏：品牌 · 天气 chip · 命令条 chip · 设置 · 九宫格 · 窗控。
  * 天气收进标题栏（v4 决策：低频信息不占画布）。
  */
 export function Titlebar({
   onCommand,
   onPanel,
   onWeather,
+  onSettings,
   panelOpen,
 }: {
   onCommand: () => void
   onPanel: () => void
   onWeather: () => void
+  onSettings: () => void
   panelOpen: boolean
 }) {
   const { data } = useWeather()
@@ -46,6 +48,9 @@ export function Titlebar({
           <span>命令</span>
           <kbd>Ctrl</kbd>
           <kbd>K</kbd>
+        </button>
+        <button className="k-icon-btn" onClick={onSettings} title="设置（主题 · 热键 · 磁贴 · 音乐源）">
+          <Settings2 size={15} />
         </button>
         <button
           className={`k-icon-btn titlebar__apps${panelOpen ? ' is-on' : ''}`}

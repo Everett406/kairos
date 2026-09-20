@@ -126,6 +126,11 @@
 
 /* ---- 展开态 ---- */
 .w-detail {
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--k-stroke-subtle) transparent;
+  padding-right: 4px;
   display: flex;
   flex-direction: column;
   gap: var(--k-space-4);
@@ -394,4 +399,151 @@
 .w-init svg {
   color: var(--k-mod);
   opacity: 0.8;
+}
+
+/* ---- v0.4.1：hero 两栏 + 24h 曲线 + 15 日范围条 ---- */
+.w-hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 4px 2px 10px;
+}
+.w-hero__right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.w-aqi--hero {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.w-aqi__sub {
+  font-size: 11.5px;
+  color: var(--k-text-muted);
+}
+.w-grid--tight {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.w-grid--tight .w-cell {
+  white-space: nowrap;
+}
+.w-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--k-text-secondary);
+  border-top: 1px solid var(--k-stroke-hairline);
+  border-bottom: 1px solid var(--k-stroke-hairline);
+  padding: 9px 2px;
+}
+.w-sun__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.w-meta__advice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  color: var(--k-text-secondary);
+}
+.w-tempchart {
+  margin-top: 10px;
+}
+.w-tempchart__ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--k-text-faint);
+  margin-top: 2px;
+}
+.w-rain24 {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 30px;
+  margin-top: 10px;
+}
+.w-rain24__col {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.w-rain24__bar {
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+.w-rain24__bar i {
+  width: 100%;
+  min-height: 1px;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(180deg, var(--k-chart-mem), rgba(111, 207, 199, 0.25));
+}
+.w-fifteen__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 2px;
+  font-size: 12px;
+}
+.w-fifteen__row img {
+  width: 22px;
+  height: 22px;
+}
+.w-fifteen__day {
+  width: 40px;
+  flex: none;
+  color: var(--k-text-secondary);
+}
+.w-fifteen__desc {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--k-text-muted);
+}
+.w-fifteen__lo {
+  width: 30px;
+  text-align: right;
+  color: var(--k-text-muted);
+}
+.w-fifteen__hi {
+  width: 30px;
+  color: var(--k-text-primary);
+  font-weight: 600;
+}
+.w-fifteen__range {
+  width: 120px;
+  flex: none;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--k-bg-inset-soft);
+  position: relative;
+  overflow: hidden;
+}
+.w-fifteen__range i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--k-chart-cpu), var(--k-warm));
+  opacity: 0.85;
+}
+.w-fifteen__pop {
+  width: 34px;
+  text-align: right;
+  color: var(--k-chart-mem);
+  font-size: 11px;
 }

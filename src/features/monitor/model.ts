@@ -32,6 +32,8 @@ export interface GpuInfo {
 export interface Stats {
   elevated: boolean
   cpu: number
+  /** 每核占用 0-100（抽屉/监控可视化用） */
+  cpuCores: number[]
   cpuName: string | null
   cpuFreqGhz: number | null
   cpuTemp: number | null
@@ -52,6 +54,18 @@ export function fetchStats(): Promise<Stats> {
 /** 管理员重启（UAC 弹窗，成功后当前进程退出） */
 export function elevate(): Promise<void> {
   return invoke<void>('system_elevate')
+}
+
+export interface ProcInfo {
+  name: string
+  pid: number
+  memMb: number
+  cpu: number
+}
+
+/** 占用 Top 进程（监控弹窗内 3s 轮询；首次调用 cpu 为 0，属预期） */
+export function fetchProcTop(): Promise<ProcInfo[]> {
+  return invoke<ProcInfo[]>('process_top')
 }
 
 /** 网速文本：<1MB/s 显示 KB/s */

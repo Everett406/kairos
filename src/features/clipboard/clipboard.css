@@ -160,3 +160,55 @@
   color: var(--k-text-muted);
   font-size: var(--k-text-sm);
 }
+
+/* ---- v0.4.1：搜索 + 置顶 ---- */
+.c-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--k-stroke-subtle);
+  border-radius: var(--k-radius-sm);
+  background: var(--k-bg-inset-soft);
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  color: var(--k-text-muted);
+}
+.c-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 12.5px;
+  color: var(--k-text-primary);
+}
+.c-search input::placeholder {
+  color: var(--k-text-faint);
+}
+.c-row__pin {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--k-radius-sm);
+  color: var(--k-text-faint);
+  opacity: 0;
+  transition: opacity var(--k-dur-fast) var(--k-ease-standard), color var(--k-dur-fast) var(--k-ease-standard), background var(--k-dur-fast) var(--k-ease-standard);
+}
+.c-row:hover .c-row__pin,
+.c-row__pin:focus {
+  opacity: 1;
+}
+.c-row__pin:hover {
+  color: var(--k-text-primary);
+  background: var(--k-bg-hover);
+}
+.c-row.is-pinned .c-row__pin {
+  opacity: 1;
+  color: var(--k-warm);
+}
+.c-row.is-pinned {
+  border-color: var(--k-warm-border);
+  background: var(--k-warm-soft);
+}

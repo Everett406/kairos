@@ -20,6 +20,9 @@ pub struct ClipItem {
     pub text: String,
     /// 记录时间戳（毫秒）
     pub at: u64,
+    /// 置顶（用户手动收藏，排序时优先）
+    #[serde(default)]
+    pub pin: bool,
 }
 
 fn history_path(app: &AppHandle) -> Option<std::path::PathBuf> {
@@ -45,17 +48,24 @@ fn push(app: &AppHandle, text: &str) {
     }
     let _guard = WRITE_LOCK.lock().unwrap();
     let mut items = load(app);
-    // 去重：已有相同内容则提到最前（时间刷新）
-    items.retain(|i| i.text != text);
-    let kind = if text.trim_start().starts_with("http://") || text.trim_start().starts_with("https://") {
-        "link"
+    // 去重：已有相同内容则提到最前（时间刷新），保留置顶态
+    if let Some(i) = items.iter().position(|i| i.text == text) {
+        let pin = items[i].pin;
+        items.remove(i);
+        let kind = if text.trim_start().starts_with("http://") || text.trim_start().starts_with("https://") {
+            "link"
+        } else {
+            "text"
+        };
+        items.insert(0, ClipItem { id: format!("{}", chrono_like_id()), kind: kind.into(), text: text.to_string(), at: now_ms(), pin });
     } else {
-        "text"
-    };
-    items.insert(
-        0,
-        ClipItem { id: format!("{}", chrono_like_id()), kind: kind.into(), text: text.to_string(), at: now_ms() },
-    );
+        let kind = if text.trim_start().starts_with("http://") || text.trim_start().starts_with("https://") {
+            "link"
+        } else {
+            "text"
+        };
+        items.insert(0, ClipItem { id: format!("{}", chrono_like_id()), kind: kind.into(), text: text.to_string(), at: now_ms(), pin: false });
+    }
     items.truncate(MAX_ITEMS);
     save(app, &items);
     let _ = app.emit("clipboard-changed", &items);
@@ -87,7 +97,23 @@ pub fn spawn_watcher(app: AppHandle) {
 
 #[tauri::command]
 pub fn clipboard_list(app: AppHandle) -> Vec<ClipItem> {
-    load(&app)
+    let mut items = load(&app);
+    items.sort_by(|a, b| b.pin.cmp(&a.pin).then(b.at.cmp(&a.at)));
+    items
+}
+
+/// 置顶 / 取消置顶（置顶项不受清空影响，防误删常用片段）
+#[tauri::command]
+pub fn clipboard_pin(app: AppHandle, id: String) -> Vec<ClipItem> {
+    let _guard = WRITE_LOCK.lock().unwrap();
+    let mut items = load(&app);
+    if let Some(i) = items.iter_mut().find(|i| i.id == id) {
+        i.pin = !i.pin;
+    }
+    save(&app, &items);
+    items.sort_by(|a, b| b.pin.cmp(&a.pin).then(b.at.cmp(&a.at)));
+    let _ = app.emit("clipboard-changed", &items);
+    items
 }
 
 #[tauri::command]
@@ -102,6 +128,8 @@ pub fn clipboard_remove(app: AppHandle, id: String) -> Vec<ClipItem> {
 #[tauri::command]
 pub fn clipboard_clear(app: AppHandle) -> Vec<ClipItem> {
     let _guard = WRITE_LOCK.lock().unwrap();
-    save(&app, &[]);
-    vec![]
+    // 置顶项是用户收藏的常用片段，清空时保留
+    let keep: Vec<ClipItem> = load(&app).into_iter().filter(|i| i.pin).collect();
+    save(&app, &keep);
+    keep
 }

@@ -1,6 +1,6 @@
 # Kairos 交接文档（HANDOFF）
 
-> 最后更新：2026-09-20 · v0.4.0 · 读者：下一个接手的人、未来的自己、协助开发的 AI
+> 最后更新：2026-09-20 · v0.4.1 · 读者：下一个接手的人、未来的自己、协助开发的 AI
 
 ## 0. 项目沿革（前世今生）
 
@@ -12,6 +12,7 @@
 | 2026-09-20 | Fork 至 Everett406/kairos；同日完成 **Tauri 2 全面重构**（`5aa7067`，移除 Electron 双后端、六模块重写、建立设计 token 体系与 CI），修复 LHM 下载 404 与 wmi 0.17 API 两处 CI 问题（`c61ce9a`、`a52c17f`），发布 **v0.3.0** |
 | 2026-09-20 | **Aurora Glass UI 重设计** + 便携版支持（`85fcfb0`）→ **v0.3.1**（发布事故见 §7，已修复转正） |
 | 2026-09-20 | **v0.4.0「Quiet Instrument」**：UI 按 v4 视觉稿架构级重构（`0aa6a82`）——新外壳（主画布 / 指标抽屉 / 九宫格功能面板 / 全局命令条 / 专注场景）+ 全局热键 Ctrl+Alt+K + acrylic 磨砂窗体；CI 一次全绿，Draft 双产物齐备待用户真机验收。同日确立 **每轮收尾工作流（§2）** 与 **版本只动末位（§3）**、**Draft-first（§4）** 三条纪律 |
+| 2026-09-20 | **v0.4.1**（按用户反馈的大迭代）：活动记录时间轴（前台应用采样）+ 设置页（主题/热键/磁贴/音乐源/自启）+ 亮色「晨雾」+ 四套主题色 + 磨砂浓度 + 抽屉加宽每核负载 + 监控进程榜 + 天气重排 + 音乐三源（网易云实测接入 / 本地扫描）+ 剪贴板搜索置顶与全局呼出（Ctrl+Alt+V） |
 
 **分支现状：**
 
@@ -23,10 +24,11 @@
 
 ## 1. 当前状态
 
-- **已发布**：v0.3.0 / v0.3.1（均正式，双产物：NSIS 安装包 + 便携版 zip）。
-- **v0.4.0（Draft，待用户验收）**：UI 按「Quiet Instrument」视觉稿全面重构——主画布仪表 + 指标抽屉 + 九宫格功能面板 + 全局命令条 + 专注场景；Tauri 侧新增全局热键（Ctrl+Alt+K）与 acrylic 磨砂窗体。版本四处已同步为 `0.4.0`。CI（run 35501297187）一次全绿，Draft 双产物齐：`Kairos_0.4.0_x64-setup.exe`（7.9 MB）+ `Kairos_0.4.0_x64-portable.zip`（9.2 MB）。**等用户真机验收（磨砂 / 热键 / 命令条）批准后转正式**。
+- **已发布**：v0.3.0 / v0.3.1（均正式）。
+- **v0.4.0**：Draft 双产物曾齐备；已被 v0.4.1 取代（未转正，新版发布后可关闭或转正，见 §12 决策点）。
+- **v0.4.1（Draft，待用户验收）**：按用户 2026-09-20 反馈清单的大迭代——主画布活动时间轴（Rust 端 5s 前台采样）、设置页（暗/亮主题、四套主题色、磨砂浓度、热键录制、主页磁贴、音乐源、开机自启）、抽屉加宽 + 每核负载柱、监控弹窗进程榜、天气重排（24h 温度曲线 + 15 日范围条）、音乐三源（QQ / 网易云免费曲库 / 本地文件夹）、剪贴板搜索置顶 + Ctrl+Alt+V 全局呼出、番茄钟刻度环打磨。版本四处已同步 `0.4.1`。
 - **CI 运行史**：v0.3.x 两次事故均已修复（见 §7）；release.yml 未变，直接复用。
-- **文档**：README 产品主页风，界面一览 9 图（随 v0.4 重写 + 补抽屉 / 命令条两图）；本文档 §2 起载明每轮收尾的强制工作流。
+- **文档**：README 产品主页风，界面一览 10 图（新增设置页）；本文档 §2 起载明每轮收尾的强制工作流。
 
 ## 2. 每轮收尾工作流（强制，用户钦定）
 
@@ -50,11 +52,12 @@ pnpm dev          # 起 Vite（5173）；mock 层自动生效，纯浏览器可�
 | 02-weather.png | 天气弹窗 | 标题栏天气 chip |
 | 03-monitor.png | 系统监控弹窗 | 点指标卡开抽屉 →「打开完整系统监控」 |
 | 04-pomodoro.png | 番茄钟 | 九宫格 → 番茄钟 |
-| 05-music.png | 音乐 | 九宫格 → 音乐 |
+| 05-music.png | 音乐 | 九宫格 → 音乐（可在设置切源：QQ / 网易云 / 本地） |
 | 06-clipboard.png | 剪贴板 | 九宫格 → 剪贴板 |
 | 07-translate.png | 翻译 | 九宫格 → 翻译 |
 | 08-drawer.png | 指标抽屉 | 点任一指标卡 |
 | 09-cmd.png | 全局命令条 | Ctrl+K 或标题栏命令 chip（可输入示例文字让建议列表出现） |
+| 10-settings.png | 设置页 | 标题栏齿轮（截「外观」页；热键 / 磁贴 / 音乐页可酌情补拍） |
 
 覆盖后逐张目检：无空数据、无穿帮、无调试痕迹。新增界面形态时按序号新建文件名（如 `10-xxx.png`）并同步进 README「界面一览」。
 
@@ -118,6 +121,8 @@ git push origin rebuild v0.4.x
 
 - **LibreHardwareMonitor 不入 git**：CI 构建时下载（资产名见 §5），本地开发需手动放置到 `src-tauri/resources/`。
 - **wmi crate 0.17 的 API**：是 `COMLibrary`（不是 COMLib），且 `WMIConnection::new(com)` / `with_namespace_path(path, com)` 都必须传入 COMLibrary 实例。
+- **网易云接口（2026-09 实测）**：老搜索 `/api/search/get/web` 已返回加密 hex，**必须走 `/api/cloudsearch/pc`**（POST form：s/type/offset/limit/total，明文 JSON，字段 `ar`/`al`/`dt`/`fee`）；播放走 `/song/media/outer/url?id={id}.mp3` 302 到 CDN（免费歌可播，VIP 歌 302 到 `/404`，以 final_url 判别）；歌词 `/api/song/lyric` 明文。这些是社区公开接口，随时可能再变，坏了先重测。
+- **m-cell 内的 .m-bar**：monitor.css 里 `.m-bar { flex: 1 }` 是给横向 flex 行用的；在 flex column 的 `.m-cell` 里会被垂直撑爆，必须用 `.m-cell .m-bar { flex: 0 0 6px }` 钉死（v0.4.1 踩过）。
 - **QQ 音乐 VIP**：免费 128k 无需登录；VIP 需要用户贴 y.qq.com 的 cookie（`uin` + `qm_keyst`），凭据存本机应用数据目录。
 - **翻译**：Google 免费端点，无 key，检测语言与目标一致时自动反向（en↔zh）。
 
@@ -167,36 +172,38 @@ shell.css       v4 外壳全套样式（src/shell/）：标题栏 / 主画布 / 
 - **v0.4「Quiet Instrument」视觉语言**：磨砂窗体（body 半透深空底，真实窗口由 Windows acrylic 模糊壁纸；浏览器预览用 `html.browser-preview` 实底兜底）、低饱和三色曲线 + 琥珀强调、发丝线玻璃卡、克制动效（150–280ms：数字滚动 / 抽屉弹簧滑入 / 弹窗缩放淡入）。
 - 功能面板（`FeaturePanel.tsx`）与监控 / 天气弹窗通过 `data-mod` 注入模块色；主画布指标卡直接用 `--k-chart-*`。
 - **已知坑**：`backdrop-filter` 元素的后代里，`position: fixed` 会被劫持为该元素的包含块——Modal 必须挂在带 backdrop-filter 的容器外面（FeaturePanel 内已有注释）。
-- 亮色主题 `theme-light.css` 结构一致，但 v4 外壳（shell.css）未做亮色映射，启用前需补齐（视觉稿 v4 帧六「晨雾」已定稿）。
+- **亮色主题「晨雾」v0.4.1 已上线**：theme-light.css 与暗色键完全同构（含 `--k-panel-grad` / `--k-focus-grad` / `--k-body-grad`），强调色预设块置于该文件末尾（利用级联顺序压过主题默认值）；shell.css 末尾有 `:root[data-theme='light']` 修正块（环形轨 / 时间轴轨等白色系玻璃元素）。
 
 ## 10. 通信边界与数据层约定
 
-- 前端与 Rust 只通过 **16 个显式 command + 2 个事件**（`clipboard-changed`、`global-cmd` 全局热键转发）通信，唯一入口 `src/lib/bridge.ts`。别绕过它直接 `invoke`。
-- 全局热键链路：Rust 侧 `tauri-plugin-global-shortcut` 注册 Ctrl+Alt+K → show + focus 主窗口 → `app.emit("global-cmd")` → App.tsx 监听后开关命令条。快捷键本身不占用 capabilities 权限（纯 Rust 侧消费）。
+- 前端与 Rust 只通过 **30 个显式 command + 3 个事件**（`clipboard-changed`、全局热键转发 `global-cmd` / `global-clipboard`）通信，唯一入口 `src/lib/bridge.ts`。别绕过它直接 `invoke`。
+- 全局热键链路：Rust 侧 `apply_hotkeys`（lib.rs）读设置注册两个热键 → 命令条热键 `app.emit("global-cmd")`、剪贴板热键 `emit("global-clipboard")` → App.tsx 监听开关对应浮层。设置页改键走 `set_hotkeys` 命令即时重注册（先 unregister_all），失败回退默认并报错。
 - `bridge.ts` 内置浏览器 mock 层：非 Tauri 环境（`window.__TAURI_INTERNALS__` 不存在）自动走 `mock.ts` 假数据，main.tsx 同时给 html 加 `browser-preview` 类。这是为了浏览器预览 / 截图流水线，桌面上零影响。
-- 模块数据 hook 做了**模块级共享缓存 + 共享轮询**（如系统监控 2s 轮询），`useMonitor` 另导出无 React 的 `onStats(fn)` 供历史缓冲（`history.ts`）直接订阅，避免 mock 同引用跳变更。
-- 番茄钟状态在 `usePomodoro.ts` 全局单例（专注场景 / 功能面板 / 命令条共享同一份计时），专注会话以 `{s,e}` 落 localStorage（`kairos.pomodoro.sessions`），主画布时间带如实渲染当日会话；其余持久化走 Rust 侧 `store.rs`（JSON 原子写）。
+- 设置存取：`src/lib/settings.ts` 用 useSyncExternalStore 订阅单键 `settings_get/settings_set`（settings.json）；主题 / 强调色 / 磨砂浓度由 App.tsx 写到 `html[data-theme/data-accent/--k-frost]`，theme-dark.css 的 `--k-body-grad` 用 calc 公式消费。
+- 模块数据 hook 做了**模块级共享缓存 + 共享轮询**（如系统监控 2s 轮询），`useMonitor` 另导出无 React 的 `onStats(fn)` 供历史缓冲（`history.ts`）直接订阅，避免 mock 同引用跳变更。进程 Top 单独走 `process_top` 命令（3s，仅监控弹窗打开时），避免拖慢主轮询。
+- 番茄钟状态在 `usePomodoro.ts` 全局单例（专注场景 / 功能面板 / 命令条共享同一份计时），专注会话以 `{s,e}` 落 localStorage（`kairos.pomodoro.sessions`），主画布活动时间轴如实渲染当日会话；其余持久化走 Rust 侧 `store.rs`（JSON 原子写）。
 
 ## 11. 目录速查
 
 | 路径 | 内容 |
 | --- | --- |
 | `src/design/` | 设计 token 三层 + primitives.tsx 组件 |
-| `src/shell/` | v4 外壳：Titlebar / MainCanvas / Drawer / FeaturePanel / CommandBar / FocusScene / Modal + shell.css |
-| `src/features/<mod>/` | 每模块：`*Panel.tsx` + `api.ts` + `use*.ts` + `model.ts` + `*.css` |
-| `src/lib/` | bridge（IPC + mock）、format、charts（自绘 SVG 图表） |
-| `src-tauri/src/` | commands/（weather / system / music / clipboard / translate）+ lib.rs（插件注册 / 全局热键） |
-| `docs/screenshots/` | 9 张界面截图（v0.4 实拍，mock 数据渲染；清单与重拍步骤见 §2） |
+| `src/shell/` | v4 外壳：Titlebar / MainCanvas / Drawer / FeaturePanel / CommandBar / FocusScene / Modal / SettingsScene + shell.css |
+| `src/features/<mod>/` | 每模块：`*Panel.tsx` + `api.ts` + `use*.ts` + `model.ts` + `*.css`（activity 只有 api.ts） |
+| `src/lib/` | bridge（IPC + mock）、format、charts（自绘 SVG 图表）、settings（设置中心） |
+| `src-tauri/src/` | commands/（weather / system / music / clipboard / translate / activity / settings）+ lib.rs（插件注册 / 热键 apply_hotkeys / set_hotkeys） |
+| `docs/screenshots/` | 10 张界面截图（v0.4.1 实拍，mock 数据渲染；清单与重拍步骤见 §2） |
 | `.github/workflows/release.yml` | 发布流水线 |
 
 ## 12. 后续可做（按优先级）
 
-1. v0.4.0 人工验收：真机跑一遍（acrylic 磨砂 / 全局热键 / 命令条），用户批准后 Draft 转正式
-2. 呼吸边条：屏幕右缘独立置顶小窗（触边滑出 / 可钉住，视觉稿 v4 帧五）
-3. 亮色主题「晨雾」：shell.css 语义映射（视觉稿 v4 帧六已定稿）
-4. 设置页：热键自定义 / 开机自启 / 刷新频率 / 磨砂浓度
-5. housekeeping：移除已不用的 gsap 依赖（需同步重生成 pnpm-lock）
-6. 音乐：播放队列持久化、桌面歌词；天气：桌面通知细分开关
+1. v0.4.1 人工验收：真机跑一遍（活动时间轴 / 设置改主题热键 / 网易云播放 / Ctrl+Alt+V），用户批准后 Draft 转正式；v0.4.0 旧 Draft 关闭或删除
+2. 音乐：网易云扫码登录（/login/qr 三段接口，接通后 VIP 曲库可播）、本地音乐 ID3 标签与内嵌封面（lofty）、播放队列持久化
+3. 主页磁贴：拖拽排序、磁贴尺寸（大 / 中 / 小）自由组合
+4. 呼吸边条：屏幕右缘独立置顶小窗（触边滑出 / 可钉住，视觉稿 v4 帧五）
+5. 剪贴板：独立小窗形态（脱离主窗口）
+6. 设置页补充：采样频率（当前固定 2s）、天气城市管理入口
+7. housekeeping：移除已不用的 gsap 依赖（需同步重生成 pnpm-lock）
 
 ## 13. 网络环境备注（开发机）
 

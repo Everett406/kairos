@@ -1,41 +1,183 @@
 /* ============================================================
- * Kairos Semantic 层 · 亮色主题
+ * Kairos Semantic 层 · 亮色主题「晨雾」
  * 与 theme-dark.css 键完全同构，只换值。
+ * shell 全套（v0.4.1 起完整支持）：磨砂白玻璃 + 深灰蓝文字。
  * ============================================================ */
 
 :root[data-theme='light'] {
   color-scheme: light;
 
-  --k-bg-base: var(--k-gray-100);
-  --k-bg-glow: rgba(59, 110, 245, 0.07);
-  --k-bg-card: rgba(255, 255, 255, 0.72);
-  --k-bg-card-hover: rgba(255, 255, 255, 0.92);
-  --k-bg-inset: rgba(19, 22, 28, 0.055);
+  /* ---- 表面 ---- */
+  --k-bg-base: #eef2f8;
+  --k-bg-card: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.82),
+    rgba(255, 255, 255, 0.55) 42%,
+    rgba(255, 255, 255, 0.66) 100%
+  );
+  --k-bg-card-hover: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.72) 46%,
+    rgba(255, 255, 255, 0.84) 100%
+  );
+  --k-bg-inset: rgba(19, 26, 38, 0.06);
+  --k-bg-inset-soft: rgba(19, 26, 38, 0.04);
   --k-bg-elevated: #ffffff;
-  --k-bg-hover: rgba(19, 22, 28, 0.05);
+  --k-bg-hover: rgba(19, 26, 38, 0.055);
 
-  --k-text-primary: #1c1f24;
-  --k-text-secondary: rgba(28, 31, 36, 0.64);
-  --k-text-muted: rgba(28, 31, 36, 0.4);
+  /* ---- 文字 ---- */
+  --k-text-primary: #1b2029;
+  --k-text-secondary: rgba(27, 32, 41, 0.66);
+  --k-text-muted: rgba(27, 32, 41, 0.44);
+  --k-text-faint: rgba(27, 32, 41, 0.3);
   --k-text-on-accent: #ffffff;
 
-  --k-stroke-hairline: rgba(19, 22, 28, 0.08);
-  --k-stroke-subtle: rgba(19, 22, 28, 0.14);
-  --k-stroke-strong: rgba(19, 22, 28, 0.28);
+  /* ---- 描边 ---- */
+  --k-hairline-hi: rgba(255, 255, 255, 0.85);
+  --k-stroke-hairline: rgba(27, 32, 41, 0.09);
+  --k-stroke-subtle: rgba(27, 32, 41, 0.16);
+  --k-stroke-strong: rgba(27, 32, 41, 0.3);
 
-  --k-accent: var(--k-blue-500);
-  --k-accent-strong: var(--k-blue-600);
-  --k-accent-soft: rgba(59, 110, 245, 0.12);
-  --k-accent-text: var(--k-blue-600);
+  /* ---- 品牌 / 状态（晨雾下加深一档保证对比度） ---- */
+  --k-accent: #2f5fe0;
+  --k-accent-strong: #2449b8;
+  --k-accent-soft: rgba(47, 95, 224, 0.12);
+  --k-accent-text: #2b56c4;
   --k-success: #178a4c;
-  --k-success-soft: rgba(23, 138, 76, 0.1);
+  --k-success-soft: rgba(23, 138, 76, 0.12);
   --k-warning: #b97a08;
-  --k-warning-soft: rgba(185, 122, 8, 0.1);
+  --k-warning-soft: rgba(185, 122, 8, 0.12);
   --k-danger: #d4473f;
-  --k-danger-soft: rgba(212, 71, 63, 0.1);
+  --k-danger-soft: rgba(212, 71, 63, 0.12);
 
-  --k-glass-blur: 16px;
+  /* ---- 默认模块色（亮色下加深） ---- */
+  --k-mod: #2f6dc4;
+  --k-mod-soft: rgba(47, 109, 196, 0.12);
+  --k-mod-border: rgba(47, 109, 196, 0.3);
+  --k-mod-glow: rgba(47, 109, 196, 0.18);
+
+  /* ---- 背景氛围光（晨雾：更淡更冷） ---- */
+  --k-glow-1: rgba(96, 145, 250, 0.14);
+  --k-glow-2: rgba(168, 150, 247, 0.12);
+  --k-glow-3: rgba(255, 170, 120, 0.08);
+
+  /* ---- v4 图表三色 + 琥珀强调（亮色下加深保对比） ---- */
+  --k-chart-cpu: #4d7ef2;
+  --k-chart-gpu: #7e6fe8;
+  --k-chart-mem: #23a89d;
+  --k-warm: #c88f2f;
+  --k-warm-soft: rgba(200, 143, 47, 0.14);
+  --k-warm-border: rgba(200, 143, 47, 0.32);
+
+  /* ---- 玻璃参数 ---- */
+  --k-glass-blur: 18px;
   --k-glass-alpha: 0.8;
   --k-glass-tint: 255, 255, 255;
   --k-glass-tint-alpha: 0.55;
+
+  /* ---- 浮出面板 / 专注场景底（晨雾白瓷） ---- */
+  --k-panel-grad: linear-gradient(172deg, rgba(255, 255, 255, 0.97), rgba(243, 247, 252, 0.98));
+  --k-focus-grad: linear-gradient(172deg, rgba(246, 249, 253, 0.94), rgba(233, 239, 248, 0.97));
+
+  /* ---- 磨砂窗体渐变（雾白玻璃） ---- */
+  --k-body-grad: linear-gradient(
+    168deg,
+    rgba(243, 246, 251, calc(0.52 + var(--k-frost, 0.88) * 0.42)),
+    rgba(226, 233, 243, calc(0.56 + var(--k-frost, 0.88) * 0.4))
+  );
+}
+
+/* ============================================================
+ * 模块主题色（亮色下加深一档）
+ * ============================================================ */
+
+:root[data-theme='light'] [data-mod='weather'] {
+  --k-mod: #2f6dc4;
+  --k-mod-soft: rgba(47, 109, 196, 0.12);
+  --k-mod-border: rgba(47, 109, 196, 0.3);
+  --k-mod-glow: rgba(47, 109, 196, 0.18);
+}
+
+:root[data-theme='light'] [data-mod='monitor'] {
+  --k-mod: #178a4c;
+  --k-mod-soft: rgba(23, 138, 76, 0.12);
+  --k-mod-border: rgba(23, 138, 76, 0.3);
+  --k-mod-glow: rgba(23, 138, 76, 0.16);
+}
+
+:root[data-theme='light'] [data-mod='pomodoro'] {
+  --k-mod: #d0492e;
+  --k-mod-soft: rgba(208, 73, 46, 0.12);
+  --k-mod-border: rgba(208, 73, 46, 0.3);
+  --k-mod-glow: rgba(208, 73, 46, 0.18);
+}
+
+:root[data-theme='light'] [data-mod='music'] {
+  --k-mod: #8a3fd0;
+  --k-mod-soft: rgba(138, 63, 208, 0.12);
+  --k-mod-border: rgba(138, 63, 208, 0.3);
+  --k-mod-glow: rgba(138, 63, 208, 0.18);
+}
+
+:root[data-theme='light'] [data-mod='clipboard'] {
+  --k-mod: #a8741a;
+  --k-mod-soft: rgba(168, 116, 26, 0.12);
+  --k-mod-border: rgba(168, 116, 26, 0.3);
+  --k-mod-glow: rgba(168, 116, 26, 0.18);
+}
+
+:root[data-theme='light'] [data-mod='translate'] {
+  --k-mod: #0f8474;
+  --k-mod-soft: rgba(15, 132, 116, 0.12);
+  --k-mod-border: rgba(15, 132, 116, 0.3);
+  --k-mod-glow: rgba(15, 132, 116, 0.18);
+}
+
+/* ============================================================
+ * 强调色预设（用户自选主题色）
+ * 本块位于两个主题文件之后：暗色下用亮色调，亮色下用深色调。
+ * indigo = 默认（两份主题文件各自的 --k-accent 即是），无需覆盖。
+ * ============================================================ */
+
+:root[data-accent='teal'] {
+  --k-accent: #46c8b2;
+  --k-accent-strong: #2ba393;
+  --k-accent-soft: rgba(70, 200, 178, 0.16);
+  --k-accent-text: #7adcab;
+}
+
+:root[data-accent='amber'] {
+  --k-accent: #e0a458;
+  --k-accent-strong: #c98a3d;
+  --k-accent-soft: rgba(224, 164, 88, 0.18);
+  --k-accent-text: #e5b368;
+}
+
+:root[data-accent='rose'] {
+  --k-accent: #ef7d9d;
+  --k-accent-strong: #d96080;
+  --k-accent-soft: rgba(239, 125, 157, 0.16);
+  --k-accent-text: #f4a0b8;
+}
+
+:root[data-theme='light'][data-accent='teal'] {
+  --k-accent: #14907e;
+  --k-accent-strong: #0e7a6a;
+  --k-accent-soft: rgba(20, 144, 126, 0.12);
+  --k-accent-text: #0f8474;
+}
+
+:root[data-theme='light'][data-accent='amber'] {
+  --k-accent: #a8741a;
+  --k-accent-strong: #8a5e10;
+  --k-accent-soft: rgba(168, 116, 26, 0.13);
+  --k-accent-text: #8f6412;
+}
+
+:root[data-theme='light'][data-accent='rose'] {
+  --k-accent: #cc4f74;
+  --k-accent-strong: #b03a5c;
+  --k-accent-soft: rgba(204, 79, 116, 0.12);
+  --k-accent-text: #b8456a;
 }

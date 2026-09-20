@@ -1,24 +1,25 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { fetchLyrics, qqLoginStatus, qqLogout, qqSaveLogin, qqSongUrl } from './api'
-import type { LyricsPayload, QqLogin, QqSong } from './api'
+import { fetchLyrics, neLyric, neSongUrl, qqLoginStatus, qqLogout, qqSaveLogin, qqSongUrl } from './api'
+import type { LyricsPayload, QqLogin, Track } from './api'
+import { fileSrc } from '../../lib/bridge'
 
 /**
- * 全局音乐播放器：audio 单例挂在这里（App 顶层 Provider），
- * 面板 compact/expanded 切换、展开收起都不中断播放。
+ * 全局音乐播放器（多源统一）：audio 单例挂在这里（App 顶层 Provider），
+ * QQ / 网易云 / 本地三种源归一为 Track；面板 compact/expanded 切换不中断播放。
  */
 
 interface PlayerCtx {
-  current: QqSong | null
+  current: Track | null
   playing: boolean
   position: number
   duration: number
   error: string
-  queue: QqSong[]
+  queue: Track[]
   login: QqLogin | null
   lyrics: LyricsPayload | null
   lyricIndex: number
-  playSong: (song: QqSong, queue?: QqSong[]) => void
+  playSong: (song: Track, queue?: Track[]) => void
   playAt: (index: number) => void
   next: () => void
   prev: () => void
@@ -60,12 +61,12 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     audioRef.current.preload = 'auto'
   }
 
-  const [current, setCurrent] = useState<QqSong | null>(null)
+  const [current, setCurrent] = useState<Track | null>(null)
   const [playing, setPlaying] = useState(false)
   const [position, setPosition] = useState(0)
   const [duration, setDuration] = useState(0)
   const [error, setError] = useState('')
-  const [queue, setQueue] = useState<QqSong[]>([])
+  const [queue, setQueue] = useState<Track[]>([])
   const [login, setLogin] = useState<QqLogin | null>(null)
   const [lyrics, setLyrics] = useState<LyricsPayload | null>(null)
   const [lyricIndex, setLyricIndex] = useState(-1)
@@ -75,7 +76,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const currentRef = useRef(current)
   currentRef.current = current
 
-  // ---- 登录态 ----
+  // ---- QQ 登录态（仅 QQ 源消费） ----
   const refreshLogin = useCallback(() => {
     qqLoginStatus()
       .then(setLogin)
@@ -83,26 +84,24 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, [])
   useEffect(refreshLogin, [refreshLogin])
 
-  const saveLogin = useCallback(
-    async (cookie: string) => {
-      const l = await qqSaveLogin(cookie)
-      setLogin(l)
-    },
-    [],
-  )
+  const saveLogin = useCallback(async (cookie: string) => {
+    const l = await qqSaveLogin(cookie)
+    setLogin(l)
+  }, [])
 
   const logout = useCallback(async () => {
     await qqLogout()
     setLogin(null)
   }, [])
 
-  // ---- 歌词：随 current 加载 ----
+  // ---- 歌词：随 current 加载（网易云按歌曲 id，其余按歌名检索） ----
   useEffect(() => {
     setLyrics(null)
     setLyricIndex(-1)
     if (!current) return
     let alive = true
-    fetchLyrics(current.name, current.singer)
+    const task = current.source === 'ne' ? neLyric(Number(current.id)) : fetchLyrics(current.name, current.singer)
+    task
       .then((p) => {
         if (alive) setLyrics(p)
       })
@@ -152,27 +151,39 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const loadAndPlay = useCallback(async (song: QqSong) => {
+  const loadAndPlay = useCallback(async (song: Track) => {
     const a = audioRef.current
     if (!a) return
     setError('')
     setPosition(0)
     setDuration(song.durationSec || 0)
     try {
-      const url = await qqSongUrl(song.songmid)
+      let url = ''
+      if (song.source === 'qq') {
+        url = await qqSongUrl(song.id)
+      } else if (song.source === 'ne') {
+        url = await neSongUrl(Number(song.id))
+      } else {
+        url = fileSrc(song.localPath ?? '')
+        if (!url) throw new Error('NO_URL：浏览器预览无法播放本地文件')
+      }
       // 用户在等待期间切了歌
-      if (currentRef.current?.songmid !== song.songmid) return
+      if (currentRef.current?.id !== song.id || currentRef.current?.source !== song.source) return
       a.src = url
       await a.play()
     } catch (e) {
       const msg = String(e)
-      setError(msg.includes('NO_URL') || msg.includes('VIP') ? msg.replace(/^.*?(NO_URL：)?/, '') : '获取音源失败')
+      setError(
+        msg.includes('NO_URL') || msg.includes('VIP') || msg.includes('版权')
+          ? msg.replace(/^.*?(NO_URL：)?/, '')
+          : '获取音源失败',
+      )
       setPlaying(false)
     }
   }, [])
 
   const playSong = useCallback(
-    (song: QqSong, q?: QqSong[]) => {
+    (song: Track, q?: Track[]) => {
       if (q) setQueue(q)
       setCurrent(song)
       void loadAndPlay(song)
@@ -194,7 +205,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       const q = queueRef.current
       const cur = currentRef.current
       if (q.length === 0) return
-      const idx = cur ? q.findIndex((s) => s.songmid === cur.songmid) : -1
+      const idx = cur ? q.findIndex((s) => s.source === cur.source && s.id === cur.id) : -1
       const nextIdx = (idx + dir + q.length) % q.length
       playSong(q[nextIdx])
     },

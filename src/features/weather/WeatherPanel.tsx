@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { MapPin, Wind, Droplets, Thermometer, Sun, Sunrise, Sunset, Umbrella } from 'lucide-react'
 import { Button, Input } from '../../design/primitives'
 import { fmtHoursMin } from '../../lib/format'
+import { AreaChart } from '../../lib/charts'
 import { weatherIcon } from './api'
 import { useWeather } from './useWeather'
 import { aqiTone, beaufort, clothingAdvice, uvLevel, windDir, wmo } from './model'
@@ -183,82 +184,98 @@ export default function WeatherPanel({ mode }: { mode: 'compact' | 'expanded' })
     )
   }
 
-  // ===== 展开态 =====
+  // ===== 展开态（v0.4.1 重排：hero 两栏 + 24h 温度曲线 + 紧凑 15 日，不再拉长页） =====
   const uv = uvLevel(cur.uvIndex)
   const aqiToneCls = aqi ? `k-tag--${aqiTone(aqi.aqi)}` : ''
   const hourly24 = data.hourly
     .filter((h) => new Date(h.time).getTime() >= Date.now() - 3600_000)
     .slice(0, 24)
   const maxRain = Math.max(10, ...hourly24.map((h) => h.precipProbability ?? 0))
+  const tempVals = hourly24.map((h) => h.temperature)
+
+  // 15 日温度范围条：按全期最低/最高定位每条的区间
+  const gMin = Math.min(...data.daily.map((d) => d.tempMin))
+  const gMax = Math.max(...data.daily.map((d) => d.tempMax))
+  const gSpan = Math.max(1, gMax - gMin)
 
   return (
     <div className="w-detail">
       {cityBar}
-      {current}
 
-      <div className="w-grid">
-        <div className="w-cell">
-          <Thermometer size={14} />
-          <span>体感</span>
-          <b className="num">{Math.round(cur.apparentTemperature)}°</b>
-        </div>
-        <div className="w-cell">
-          <Droplets size={14} />
-          <span>湿度</span>
-          <b className="num">{cur.humidity}%</b>
-        </div>
-        <div className="w-cell">
-          <Wind size={14} />
-          <span>{windDir(cur.windDirection)}</span>
-          <b className="num">{beaufort(cur.windGusts ?? cur.windSpeed)}</b>
-        </div>
-        <div className="w-cell">
-          <Sun size={14} />
-          <span>紫外线</span>
-          <b>{uv ? `${uv.label}${cur.uvIndex != null ? ` · ${Math.round(cur.uvIndex)}` : ''}` : '—'}</b>
+      <div className="w-hero">
+        {current}
+        <div className="w-hero__right">
+          {aqi && (
+            <div className="w-aqi w-aqi--hero">
+              <span className={`k-tag ${aqiToneCls}`}>
+                AQI {aqi.aqi} · {aqi.level}
+              </span>
+              <span className="w-aqi__sub num">
+                PM2.5 {Math.round(aqi.pm25)} · PM10 {Math.round(aqi.pm10)}
+                {aqi.primary ? ` · 首要 ${aqi.primary}` : ''}
+              </span>
+            </div>
+          )}
+          <div className="w-grid w-grid--tight">
+            <div className="w-cell">
+              <Thermometer size={13} />
+              <span>体感</span>
+              <b className="num">{Math.round(cur.apparentTemperature)}°</b>
+            </div>
+            <div className="w-cell">
+              <Droplets size={13} />
+              <span>湿度</span>
+              <b className="num">{cur.humidity}%</b>
+            </div>
+            <div className="w-cell">
+              <Wind size={13} />
+              <span>{windDir(cur.windDirection)}</span>
+              <b className="num">{beaufort(cur.windGusts ?? cur.windSpeed)}</b>
+            </div>
+            <div className="w-cell">
+              <Sun size={13} />
+              <span>紫外线</span>
+              <b>{uv ? uv.label : '—'}</b>
+            </div>
+          </div>
         </div>
       </div>
 
       {today && (
-        <div className="w-advice">
-          <Umbrella size={14} />
-          <span>{clothingAdvice(cur.apparentTemperature, cur.weatherCode)}</span>
-        </div>
-      )}
-
-      {today?.sunrise && (
-        <div className="w-sun">
-          <span className="w-sun__item">
-            <Sunrise size={14} /> 日出 {hhmm(today.sunrise)}
-          </span>
-          <span className="w-sun__item">
-            <Sunset size={14} /> 日落 {hhmm(today.sunset ?? null)}
-          </span>
+        <div className="w-meta">
+          {today.sunrise && (
+            <span className="w-sun__item">
+              <Sunrise size={13} /> <span className="num">{hhmm(today.sunrise)}</span>
+            </span>
+          )}
+          {today.sunset && (
+            <span className="w-sun__item">
+              <Sunset size={13} /> <span className="num">{hhmm(today.sunset)}</span>
+            </span>
+          )}
           {today.daylightDuration != null && (
             <span className="w-sun__item num">昼长 {fmtHoursMin(today.daylightDuration)}</span>
           )}
+          <span className="w-meta__advice">
+            <Umbrella size={13} />
+            {clothingAdvice(cur.apparentTemperature, cur.weatherCode)}
+          </span>
         </div>
       )}
 
-      {aqi && (
-        <div className="w-aqi">
-          <div className="w-aqi__head">
-            <span>空气质量</span>
-            <span className={`k-tag ${aqiToneCls}`}>
-              AQI {aqi.aqi} · {aqi.level}
-            </span>
-          </div>
-          <div className="w-aqi__body">
-            <span>PM2.5 <b className="num">{Math.round(aqi.pm25)}</b></span>
-            <span>PM10 <b className="num">{Math.round(aqi.pm10)}</b></span>
-            {aqi.primary && <span>首要污染物 <b>{aqi.primary}</b></span>}
-          </div>
-        </div>
-      )}
-
-      {/* 未来 24h 降水概率 */}
+      {/* 未来 24h：温度曲线 + 降水概率 */}
       <section className="w-section">
-        <h4>未来 24 小时降水</h4>
+        <h4>未来 24 小时</h4>
+        {tempVals.length > 2 && (
+          <div className="w-tempchart">
+            <AreaChart vals={tempVals} color="var(--k-chart-cpu)" w={620} h={96} grid />
+            <div className="w-tempchart__ticks num">
+              <span>{hourly24[0]?.time.slice(11, 16)}</span>
+              <span>{hourly24[Math.floor(hourly24.length / 2)]?.time.slice(11, 16)}</span>
+              <span>{hourly24[hourly24.length - 1]?.time.slice(11, 16)}</span>
+            </div>
+          </div>
+        )}
         <div className="w-rain24">
           {hourly24.map((h) => {
             const p = h.precipProbability ?? 0
@@ -267,28 +284,31 @@ export default function WeatherPanel({ mode }: { mode: 'compact' | 'expanded' })
                 <div className="w-rain24__bar">
                   <i style={{ height: `${(p / maxRain) * 100}%` }} />
                 </div>
-                <span className="w-rain24__hour">{h.time.slice(11, 13)}</span>
               </div>
             )
           })}
         </div>
       </section>
 
-      {/* 15 日预报 */}
+      {/* 15 日预报：紧凑行 + 真实温度范围条 */}
       <section className="w-section">
         <h4>15 日预报</h4>
         <div className="w-fifteen">
           {data.daily.map((d, i) => {
             const { desc: dd, icon: di } = wmo(d.weatherCode, true)
+            const left = ((d.tempMin - gMin) / gSpan) * 100
+            const width = Math.max(6, ((d.tempMax - d.tempMin) / gSpan) * 100)
             return (
               <div className="w-fifteen__row" key={d.date}>
                 <span className="w-fifteen__day">{dayLabel(d.date, i)}</span>
                 <img src={weatherIcon(di)} alt={dd} title={dd} />
                 <span className="w-fifteen__desc">{dd}</span>
-                <span className="w-fifteen__pop num">{d.precipProbability != null ? `${d.precipProbability}%` : ''}</span>
-                <span className="num w-fifteen__temp">
-                  {Math.round(d.tempMin)}° <i><b style={{ width: '34px' }} /></i> {Math.round(d.tempMax)}°
+                <span className="num w-fifteen__lo">{Math.round(d.tempMin)}°</span>
+                <span className="w-fifteen__range">
+                  <i style={{ left: `${left}%`, width: `${width}%` }} />
                 </span>
+                <span className="num w-fifteen__hi">{Math.round(d.tempMax)}°</span>
+                <span className="w-fifteen__pop num">{d.precipProbability != null ? `${d.precipProbability}%` : ''}</span>
               </div>
             )
           })}
