@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Kairos",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "identifier": "com.kairos.desktop",
   "build": {
     "frontendDist": "../dist",
@@ -21,7 +21,11 @@
         "resizable": true,
         "center": true,
         "shadow": false,
-        "backgroundColor": "#0f1216"
+        "transparent": true,
+        "windowEffects": {
+          "effects": ["acrylic"],
+          "state": "followsWindowActiveState"
+        }
       }
     ],
     "security": {

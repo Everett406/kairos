@@ -1,138 +1,32 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
 import { Play, Pause, RotateCcw, Minus, Plus, Coffee } from 'lucide-react'
 import { Button, Tag } from '../../design/primitives'
-import { notify } from '../../lib/bridge'
 import { fmtMmss } from '../../lib/format'
+import { usePomodoro, MODE_META } from './usePomodoro'
+import type { PomodoroMode } from './usePomodoro'
 import './pomodoro.css'
 
-type Mode = 'focus' | 'short' | 'long'
-
-const MODE_META: Record<Mode, { label: string; defMin: number; doneText: string }> = {
-  focus: { label: '专注', defMin: 25, doneText: '专注完成，休息一下吧' },
-  short: { label: '短休', defMin: 5, doneText: '休息结束，继续专注' },
-  long: { label: '长休', defMin: 15, doneText: '长休息结束，继续专注' },
-}
-
-const DUR_KEY = 'kairos.pomodoro.durations'
-const COUNT_KEY = 'kairos.pomodoro.count'
-
-function today(): string {
-  return new Date().toISOString().slice(0, 10)
-}
-
-function loadDurations(): Record<Mode, number> {
-  try {
-    const raw = JSON.parse(localStorage.getItem(DUR_KEY) || '{}')
-    return {
-      focus: raw.focus ?? MODE_META.focus.defMin,
-      short: raw.short ?? MODE_META.short.defMin,
-      long: raw.long ?? MODE_META.long.defMin,
-    }
-  } catch {
-    return { focus: 25, short: 5, long: 15 }
-  }
-}
-
-function loadTodayCount(): number {
-  try {
-    const obj = JSON.parse(localStorage.getItem(COUNT_KEY) || '{}')
-    return obj[today()] ?? 0
-  } catch {
-    return 0
-  }
-}
-
-function bumpTodayCount() {
-  try {
-    const obj = JSON.parse(localStorage.getItem(COUNT_KEY) || '{}')
-    obj[today()] = (obj[today()] ?? 0) + 1
-    localStorage.setItem(COUNT_KEY, JSON.stringify(obj))
-  } catch {
-    /* ignore */
-  }
-}
-
+/**
+ * 番茄钟面板：UI 与状态分离 —— 计时状态在 usePomodoro 全局单例，
+ * 与专注场景 / 命令条共享同一份，切面板不中断计时。
+ */
 export default function PomodoroPanel({ mode }: { mode: 'compact' | 'expanded' }) {
-  const [mode_, setMode] = useState<Mode>('focus')
-  const [durations, setDurations] = useState(loadDurations)
-  const [running, setRunning] = useState(false)
-  // 用时间戳倒计时，避免 interval 漂移；暂停时保留剩余秒
-  const [remainSec, setRemainSec] = useState(durations.focus * 60)
-  const endAtRef = useRef<number | null>(null)
-  const [doneCount, setDoneCount] = useState(loadTodayCount)
-
-  const totalSec = durations[mode_] * 60
-
-  // 切模式：重置计时
-  const switchMode = (m: Mode) => {
-    setMode(m)
-    setRunning(false)
-    endAtRef.current = null
-    setRemainSec(loadDurations()[m] * 60)
-  }
-
-  const onDone = useCallback(() => {
-    setRunning(false)
-    endAtRef.current = null
-    const meta = MODE_META[mode_]
-    if (mode_ === 'focus') {
-      bumpTodayCount()
-      setDoneCount(loadTodayCount())
-      // 每 4 个专注进长休
-      const next = (doneCount + 1) % 4 === 0 ? 'long' : 'short'
-      notify('番茄钟', meta.doneText)
-      setMode(next)
-      setRemainSec(loadDurations()[next] * 60)
-    } else {
-      notify('番茄钟', meta.doneText)
-      setMode('focus')
-      setRemainSec(loadDurations().focus * 60)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode_, doneCount])
-
-  useEffect(() => {
-    if (!running) return
-    const id = window.setInterval(() => {
-      const endAt = endAtRef.current
-      if (endAt == null) return
-      const left = Math.max(0, Math.round((endAt - Date.now()) / 1000))
-      setRemainSec(left)
-      if (left <= 0) onDone()
-    }, 250)
-    return () => window.clearInterval(id)
-  }, [running, onDone])
+  const p = usePomodoro()
+  const { running, remainSec, totalSec, progress, doneCount } = p
+  const meta = MODE_META[p.mode]
 
   const toggle = (e: React.MouseEvent) => {
     e.stopPropagation()
-    if (running) {
-      setRunning(false)
-      endAtRef.current = null
-    } else {
-      endAtRef.current = Date.now() + remainSec * 1000
-      setRunning(true)
-    }
+    running ? p.pause() : p.start()
   }
-
   const reset = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setRunning(false)
-    endAtRef.current = null
-    setRemainSec(totalSec)
+    p.reset()
   }
-
   const adjustDur = (e: React.MouseEvent, delta: number) => {
     e.stopPropagation()
-    if (running) return
-    setDurations((prev) => {
-      const next = { ...prev, [mode_]: Math.min(180, Math.max(1, prev[mode_] + delta)) }
-      localStorage.setItem(DUR_KEY, JSON.stringify(next))
-      setRemainSec(next[mode_] * 60)
-      return next
-    })
+    p.adjustDur(p.mode, delta)
   }
 
-  const progress = totalSec > 0 ? 1 - remainSec / totalSec : 0
   const runningCls = running ? ' is-running' : ''
 
   // R = 46, 周长 ≈ 289
@@ -154,7 +48,7 @@ export default function PomodoroPanel({ mode }: { mode: 'compact' | 'expanded' }
       </svg>
       <div className="p-dial__inner">
         <span className="num p-dial__time">{fmtMmss(remainSec)}</span>
-        <span className="p-dial__mode">{MODE_META[mode_].label}</span>
+        <span className="p-dial__mode">{meta.label}</span>
       </div>
     </div>
   )
@@ -187,14 +81,14 @@ export default function PomodoroPanel({ mode }: { mode: 'compact' | 'expanded' }
       {dial}
 
       <div className="p-modes" onClick={(e) => e.stopPropagation()}>
-        {(Object.keys(MODE_META) as Mode[]).map((m) => (
+        {(Object.keys(MODE_META) as PomodoroMode[]).map((m) => (
           <button
             key={m}
-            className={`p-mode${m === mode_ ? ' is-active' : ''}`}
-            onClick={() => switchMode(m)}
+            className={`p-mode${m === p.mode ? ' is-active' : ''}`}
+            onClick={() => p.switchMode(m)}
           >
             {MODE_META[m].label}
-            <span className="num p-mode__min">{durations[m]}min</span>
+            <span className="num p-mode__min">{p.durations[m]}min</span>
           </button>
         ))}
       </div>
@@ -211,11 +105,11 @@ export default function PomodoroPanel({ mode }: { mode: 'compact' | 'expanded' }
       </div>
 
       <div className="p-adjust" onClick={(e) => e.stopPropagation()}>
-        <span>调整{MODE_META[mode_].label}时长</span>
+        <span>调整{meta.label}时长</span>
         <button className="p-icon-btn" onClick={(e) => adjustDur(e, -5)} disabled={running}>
           <Minus size={13} />
         </button>
-        <span className="num p-adjust__val">{durations[mode_]} min</span>
+        <span className="num p-adjust__val">{p.durations[p.mode]} min</span>
         <button className="p-icon-btn" onClick={(e) => adjustDur(e, 5)} disabled={running}>
           <Plus size={13} />
         </button>

@@ -5,6 +5,8 @@ mod commands;
 mod store;
 
 use std::sync::Mutex;
+use tauri::{Emitter, Manager};
+use tauri_plugin_global_shortcut::ShortcutState;
 
 pub struct LyricsCache(pub Mutex<std::collections::HashMap<String, commands::music::LyricsPayload>>);
 
@@ -16,6 +18,23 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_notification::init())
+        // 全局热键：任何应用下 Ctrl+Alt+K 呼出 Kairos 命令条（v4 决策 4）
+        .plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_shortcuts(["ctrl+alt+k"])
+                .expect("注册全局热键失败：Ctrl+Alt+K 可能被占用")
+                .with_handler(|app, _shortcut, event| {
+                    if event.state == ShortcutState::Pressed {
+                        if let Some(win) = app.get_webview_window("main") {
+                            let _ = win.unminimize();
+                            let _ = win.show();
+                            let _ = win.set_focus();
+                        }
+                        let _ = app.emit("global-cmd", ());
+                    }
+                })
+                .build(),
+        )
         .manage(LyricsCache(Mutex::new(std::collections::HashMap::new())))
         .manage(commands::system::SystemState::new())
         .setup(|app| {

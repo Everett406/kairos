@@ -22,14 +22,14 @@
 
 ## 1. 当前状态
 
-- **已发布**：v0.3.0（正式，NSIS 安装包 7.5 MB）；v0.3.1 处于 **Draft，双产物已齐**（安装包 7.5 MB + 便携版 8.8 MB），待人工验收后转正式。
-- **版本一致性**：`package.json` / `src-tauri/tauri.conf.json` / `src-tauri/Cargo.toml` / `src-tauri/Cargo.lock` 四处均为 `0.3.1`，已核对。
-- **CI 运行史**：v0.3.0 两次失败（LHM 资产名 404、wmi API 误用）后修复成功；v0.3.1 败于便携版上传，已修复（§6）并经 dispatch 重建验证成功。
-- **文档**：README 为产品主页风；本文档负责工程细节与决策记录。
+- **已发布**：v0.3.0 / v0.3.1（均正式，双产物：NSIS 安装包 + 便携版 zip）。
+- **v0.4.0（当前）**：UI 按「Quiet Instrument」视觉稿全面重构 —— 主画布仪表 + 指标抽屉 + 九宫格功能面板 + 全局命令条 + 专注场景；Tauri 侧新增全局热键（Ctrl+Alt+K）与 acrylic 磨砂窗体。版本四处已同步为 `0.4.0`。
+- **CI 运行史**：v0.3.x 两次事故均已修复（见 §6）；release.yml 未变，直接复用。
+- **文档**：README 为产品主页风（已随 v0.4 重写）；本文档负责工程细节与决策记录。
 
 ## 2. 版本纪律（硬约束）
 
-- **只动最后一位**：版本号保持 `0.3.x`，发版一律 patch 递增（0.3.1 → 0.3.2 → 0.3.3…）。**不主动升 minor / major**，除非明确做出架构级决策并记录在案。
+- **0.3.x → 0.4.0**：v0.4.0 因 UI 架构级重构（外壳重写 + 全局热键 + acrylic）升 minor，符合例外条款并记录在案；后续若无同类决策仍只动 patch 位。
 - **改版本号必须四处同步**，漏一处 CI 就会产出错版号的产物：
 
 ```bash
@@ -119,30 +119,34 @@ git config user.email "Everett406@users.noreply.github.com"
 tokens.css      原子值：灰阶 / 蓝阶 / 间距 / 字号 / 圆角 / 阴影 / 动效
 theme-*.css     语义映射：表面 / 文字 / 描边 / 状态色 / 玻璃参数 / 背景氛围光
                 + [data-mod='xxx'] 六个模块主题色（--k-mod 组）
+                + v4 图表三色 --k-chart-cpu/gpu/mem 与琥珀 --k-warm 组
 primitives.css  基础组件样式：k-card / k-btn / k-field / k-tag / k-empty
+shell.css       v4 外壳全套样式（src/shell/）：标题栏 / 主画布 / 抽屉 / 面板 / 命令条 / 专注场景
 ```
 
-- 每张卡片通过 `ModuleCard.tsx` 的 `data-mod={mod.id}` 注入主题色，图标芯片、悬停光晕、进度条、焦点态全部跟随 `--k-mod` 系列变量。新增模块时在 `theme-dark.css` 加一组 `[data-mod]` 即可。
-- 视觉语言：「Aurora Glass」——深空蓝底（`#0a0e17`）+ 三团彩色氛围光（蓝 / 紫 / 暖橙）+ SVG 噪点压 banding + 渐变玻璃卡片（顶部 1px 内高光）。
-- 亮色主题 `theme-light.css` 结构与暗色一致，但尚未覆盖 `[data-mod]` 之外的最新变量（如 `--k-glow-*`），启用前需补齐。
+- **v0.4「Quiet Instrument」视觉语言**：磨砂窗体（body 半透深空底，真实窗口由 Windows acrylic 模糊壁纸；浏览器预览用 `html.browser-preview` 实底兜底）、低饱和三色曲线 + 琥珀强调、发丝线玻璃卡、克制动效（150–280ms：数字滚动 / 抽屉弹簧滑入 / 弹窗缩放淡入）。
+- 功能面板（`FeaturePanel.tsx`）与监控 / 天气弹窗通过 `data-mod` 注入模块色；主画布指标卡直接用 `--k-chart-*`。
+- **已知坑**：`backdrop-filter` 元素的后代里，`position: fixed` 会被劫持为该元素的包含块 —— Modal 必须挂在带 backdrop-filter 的容器外面（FeaturePanel 内已有注释）。
+- 亮色主题 `theme-light.css` 结构一致，但 v4 外壳（shell.css）未做亮色映射，启用前需补齐（视觉稿 v4 帧六「晨雾」已定稿）。
 
 ## 9. 通信边界与数据层约定
 
-- 前端与 Rust 只通过 **16 个显式 command + 1 个事件**（`clipboard-changed`）通信，唯一入口 `src/lib/bridge.ts`。别绕过它直接 `invoke`。
-- `bridge.ts` 内置浏览器 mock 层：非 Tauri 环境（`window.__TAURI_INTERNALS__` 不存在）自动走 `mock.ts` 假数据。这是为了浏览器预览 / 截图流水线，桌面上零影响。
-- 模块数据 hook 做了**模块级共享缓存 + 共享轮询**（如系统监控 2s 轮询），因为卡片展开 / 收起是实例卸载重建，不做共享会重复请求。
-- 番茄钟用**时间戳倒计时**（`endAtRef`）防 interval 漂移；每日计数存 localStorage（`kairos.pomodoro.*`）；其余持久化走 Rust 侧 `store.rs`（JSON 原子写）。
+- 前端与 Rust 只通过 **16 个显式 command + 2 个事件**（`clipboard-changed`、`global-cmd` 全局热键转发）通信，唯一入口 `src/lib/bridge.ts`。别绕过它直接 `invoke`。
+- 全局热键链路：Rust 侧 `tauri-plugin-global-shortcut` 注册 Ctrl+Alt+K → show + focus 主窗口 → `app.emit("global-cmd")` → App.tsx 监听后开关命令条。快捷键本身不占用 capabilities 权限（纯 Rust 侧消费）。
+- `bridge.ts` 内置浏览器 mock 层：非 Tauri 环境（`window.__TAURI_INTERNALS__` 不存在）自动走 `mock.ts` 假数据，main.tsx 同时给 html 加 `browser-preview` 类。这是为了浏览器预览 / 截图流水线，桌面上零影响。
+- 模块数据 hook 做了**模块级共享缓存 + 共享轮询**（如系统监控 2s 轮询），`useMonitor` 另导出无 React 的 `onStats(fn)` 供历史缓冲（`history.ts`）直接订阅，避免 mock 同引用跳变更。
+- 番茄钟状态在 `usePomodoro.ts` 全局单例（专注场景 / 功能面板 / 命令条共享同一份计时），专注会话以 `{s,e}` 落 localStorage（`kairos.pomodoro.sessions`），主画布时间带如实渲染当日会话；其余持久化走 Rust 侧 `store.rs`（JSON 原子写）。
 
 ## 10. 目录速查
 
 | 路径 | 内容 |
 | --- | --- |
 | `src/design/` | 设计 token 三层 + primitives.tsx 组件 |
-| `src/app/` | Titlebar / ModuleCard（FLIP）/ 外壳样式 |
+| `src/shell/` | v4 外壳：Titlebar / MainCanvas / Drawer / FeaturePanel / CommandBar / FocusScene / Modal + shell.css |
 | `src/features/<mod>/` | 每模块：`*Panel.tsx` + `api.ts` + `use*.ts` + `model.ts` + `*.css` |
-| `src/lib/` | bridge（IPC + mock）、format |
-| `src-tauri/src/commands/` | weather / system / music / clipboard / translate |
-| `docs/screenshots/` | 7 张界面截图（playwright + mock 层自动生成） |
+| `src/lib/` | bridge（IPC + mock）、format、charts（自绘 SVG 图表） |
+| `src-tauri/src/` | commands/（weather / system / music / clipboard / translate）+ lib.rs（插件注册 / 全局热键） |
+| `docs/screenshots/` | 7 张界面截图（v0.4 实拍） |
 | `.github/workflows/release.yml` | 发布流水线 |
 
 ## 11. 截图流水线（复现方式）
@@ -155,12 +159,12 @@ node shot.mjs                               # playwright-core 无头截图（脚
 
 ## 12. 后续可做（按优先级）
 
-1. v0.3.1 人工验收后转正式（Draft 双产物已齐，见 §6）
-2. UI 舒适度打磨：整体看着舒服、设计合理（进行中议题，待细化）
-3. 亮色主题补齐新 token（`--k-glow-*`、`[data-mod]` 组）
-4. 设置页（主题切换 / 开机自启 / 刷新频率）
-5. 音乐：播放队列持久化、桌面歌词；天气：桌面通知细分开关
-6. 卡片布局自定义（拖拽排序 / 隐藏模块）
+1. v0.4.0 人工验收：真机跑一遍（acrylic 磨砂 / 全局热键 / 命令条），Draft 转正式
+2. 呼吸边条：屏幕右缘独立置顶小窗（触边滑出 / 可钉住，视觉稿 v4 帧五）
+3. 亮色主题「晨雾」：shell.css 语义映射（视觉稿 v4 帧六已定稿）
+4. 设置页：热键自定义 / 开机自启 / 刷新频率 / 磨砂浓度
+5. housekeeping：移除已不用的 gsap 依赖（需同步重生成 pnpm-lock）
+6. 音乐：播放队列持久化、桌面歌词；天气：桌面通知细分开关
 
 ## 13. 网络环境备注（开发机）
 

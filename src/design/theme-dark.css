@@ -63,6 +63,14 @@
   --k-glow-2: rgba(168, 85, 247, 0.11);     /* 右上 · 紫 */
   --k-glow-3: rgba(255, 122, 89, 0.075);    /* 底部 · 暖橙 */
 
+  /* ---- v4 Quiet Instrument：图表三色 + 琥珀强调 ---- */
+  --k-chart-cpu: #7ca5f7;
+  --k-chart-gpu: #a79bf5;
+  --k-chart-mem: #6fcfc7;
+  --k-warm: #e5b368;
+  --k-warm-soft: rgba(229, 179, 104, 0.14);
+  --k-warm-border: rgba(229, 179, 104, 0.32);
+
   /* ---- 玻璃参数（换肤入口） ---- */
   --k-glass-blur: 22px;
   --k-glass-alpha: 0.72;

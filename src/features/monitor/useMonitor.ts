@@ -69,3 +69,13 @@ export function useMonitor(): Stats | null {
 
   return stats
 }
+
+/** 无 React 的原始订阅（历史缓冲等非组件消费场景用），会兜底启动轮询 */
+export function onStats(fn: (s: Stats) => void): () => void {
+  subs.add(fn)
+  ensurePolling()
+  return () => {
+    subs.delete(fn)
+    maybeStopPolling()
+  }
+}

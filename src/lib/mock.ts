@@ -170,13 +170,13 @@ function translate(text: string, target: string) {
   const isChinese = /[\u4e00-\u9fff]/.test(trimmed)
   if (isChinese && target.startsWith('en')) {
     return {
-      text: 'Kairos is a card-style desktop widget panel built with Tauri 2, where every card expands into a full-screen detail view with a GSAP FLIP animation.',
+      text: 'Kairos is an acrylic frosted system dashboard built with Tauri 2, where the global command bar is one keystroke away.',
       detected: 'zh-CN',
     }
   }
   if (!isChinese) {
     return {
-      text: 'Kairos 是一个基于 Tauri 2 的卡片式桌面小组件面板，每张卡片都能以 GSAP FLIP 动画展开为全屏详情视图。',
+      text: 'Kairos 是一个基于 Tauri 2 的磨砂质感系统仪表盘，全局命令条一键直达，翻译剪贴板音乐番茄钟都在这里。',
       detected: 'en',
     }
   }
@@ -203,8 +203,15 @@ export function mockInvoke<T>(cmd: string, args?: Record<string, unknown>): Prom
       STATS.cpu = Math.min(95, Math.max(4, STATS.cpu + (Math.random() - 0.5) * 6))
       STATS.netDown = Math.max(0.02, STATS.netDown + (Math.random() - 0.5) * 0.8)
       STATS.netUp = Math.max(0.02, STATS.netUp + (Math.random() - 0.5) * 0.2)
+      // 内存慢漂移：真实系统里随应用开关缓变
+      STATS.memUsed = Math.min(16, Math.max(9, STATS.memUsed + (Math.random() - 0.5) * 0.24))
       if (STATS.gpu) STATS.gpu.util = Math.min(98, Math.max(3, STATS.gpu.util + (Math.random() - 0.5) * 10))
-      return ok(STATS)
+      // 返回深克隆：保持每次调用引用不同，否则 React setState 判等会跳过更新
+      return ok({
+        ...STATS,
+        disks: STATS.disks.map((d) => ({ ...d, volumes: d.volumes.map((v) => ({ ...v })) })),
+        gpu: STATS.gpu ? { ...STATS.gpu } : null,
+      })
     }
     case 'system_elevate':
       return Promise.reject('浏览器预览不支持提权')

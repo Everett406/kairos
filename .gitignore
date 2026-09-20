@@ -41,3 +41,4 @@ src-tauri/resources/LibreHardwareMonitor/*
 *.njsproj
 *.sln
 *.sw?
+bun.lock
