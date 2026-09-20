@@ -44,11 +44,10 @@ body {
   user-select: none;
 }
 .titlebar__logo {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--k-radius-full);
-  background: var(--k-chart-cpu);
-  box-shadow: 0 0 9px rgba(124, 165, 247, 0.75);
+  width: 16px;
+  height: 16px;
+  border-radius: 4.5px;
+  background: url('/favicon.svg') center / contain no-repeat;
 }
 .titlebar__name {
   font-family: var(--k-font-display);
@@ -906,7 +905,7 @@ body {
   gap: 3px;
 }
 .kx-cmdbar__grp {
-  padding: 6px 8px 8px;
+  padding: 6px 8px;
 }
 .kx-cmdbar__cap {
   display: block;
