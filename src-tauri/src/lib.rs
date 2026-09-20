@@ -56,12 +56,6 @@ pub fn apply_hotkeys(app: &tauri::AppHandle, cmd: &str, clip: &str) -> Result<()
     Ok(())
 }
 
-/// 设置页改键命令：保存（前端已写 settings）+ 立即生效
-#[tauri::command]
-pub fn set_hotkeys(app: tauri::AppHandle, cmd: String, clip: String) -> Result<(), String> {
-    apply_hotkeys(&app, &cmd, &clip)
-}
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -122,7 +116,7 @@ pub fn run() {
             commands::settings::autostart_status,
             commands::settings::autostart_set,
             commands::settings::pick_folder,
-            set_hotkeys,
+            commands::settings::set_hotkeys,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
