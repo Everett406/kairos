@@ -18,7 +18,6 @@ pub struct SystemState {
     sys: Mutex<System>,
     nets: Mutex<Networks>,
     last_net: Mutex<Option<(u64, u64, Instant)>>,
-    gpu: Mutex<Option<GpuSample>>,
 }
 
 #[derive(Clone, Serialize)]
@@ -41,7 +40,6 @@ impl SystemState {
             sys: Mutex::new(sys),
             nets: Mutex::new(Networks::new_with_refreshed_list()),
             last_net: Mutex::new(None),
-            gpu: Mutex::new(None),
         })
     }
 }
@@ -160,15 +158,14 @@ mod win {
     static LHM_TRIED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
     fn com_con() -> Result<wmi::WMIConnection, String> {
-        wmi::WMIConnection::new(wmi::COMLib::create_instance().map_err(|e| format!("WMI 初始化失败：{e}"))?)
+        let com = wmi::COMLibrary::new().map_err(|e| format!("WMI 初始化失败：{e}"))?;
+        wmi::WMIConnection::new(com).map_err(|e| format!("WMI 连接失败：{e}"))
     }
 
     fn lhm_con() -> Result<wmi::WMIConnection, String> {
-        wmi::WMIConnection::with_namespace_path(
-            "ROOT\\LibreHardwareMonitor",
-            wmi::COMLib::create_instance().map_err(|e| format!("WMI 初始化失败：{e}"))?,
-        )
-        .map_err(|e| format!("LHM 命名空间不可用：{e}"))
+        let com = wmi::COMLibrary::new().map_err(|e| format!("WMI 初始化失败：{e}"))?;
+        wmi::WMIConnection::with_namespace_path("ROOT\\LibreHardwareMonitor", com)
+            .map_err(|e| format!("LHM 命名空间不可用：{e}"))
     }
 
     #[derive(Deserialize, Debug)]
@@ -313,27 +310,12 @@ mod win {
         #[derive(Deserialize)]
         #[serde(rename_all = "PascalCase")]
         struct Link { antecedent: String, dependent: String }
-        #[derive(Deserialize)]
-        #[serde(rename_all = "PascalCase")]
-        struct LogicalDisk { device_id: String, #[serde(default)] size: Option<String>, #[serde(default)] free_space: Option<String> }
 
         let links1: Vec<Link> = con.raw_query("SELECT Antecedent,Dependent FROM Win32_DiskDriveToDiskPartition").unwrap_or_default();
         let links2: Vec<Link> = con.raw_query("SELECT Antecedent,Dependent FROM Win32_LogicalDiskToPartition").unwrap_or_default();
-        let logical: Vec<LogicalDisk> = con
-            .raw_query("SELECT DeviceID,Size,FreeSpace FROM Win32_LogicalDisk WHERE DriveType=3")
-            .unwrap_or_default();
 
         // partition key: "Disk #0, Partition #1"
         let part_of = |path: &str| ref_key(path, "Win32_DiskPartition.DeviceID=\"");
-        let letter_sizes: std::collections::HashMap<String, (u64, u64)> = logical
-            .into_iter()
-            .map(|l| {
-                let letter = l.device_id.trim_end_matches(':').to_uppercase();
-                let size = l.size.and_then(|s| s.parse().ok()).unwrap_or(0);
-                let free = l.free_space.and_then(|s| s.parse().ok()).unwrap_or(0);
-                (letter, (size, size - free))
-            })
-            .collect();
 
         // drive index → partitions
         let mut drive_parts: std::collections::HashMap<u32, Vec<String>> = std::collections::HashMap::new();
