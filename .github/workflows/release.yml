@@ -42,11 +42,16 @@ jobs:
           $dest = "src-tauri/resources/LibreHardwareMonitor"
           New-Item -ItemType Directory -Force -Path $dest | Out-Null
           Invoke-WebRequest `
-            -Uri "https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases/latest/download/LibreHardwareMonitor-net472.zip" `
+            -Uri "https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases/latest/download/LibreHardwareMonitor.zip" `
             -OutFile "lhm.zip"
-          Expand-Archive -Path "lhm.zip" -DestinationPath $dest -Force
-          Remove-Item "lhm.zip"
-          Get-ChildItem $dest | Select-Object Name
+          Expand-Archive -Path "lhm.zip" -DestinationPath "lhm_tmp" -Force
+          # 无论 zip 是否带顶层目录，全部平铺到 dest
+          Get-ChildItem "lhm_tmp" -Recurse -File | Copy-Item -Destination $dest -Force
+          Remove-Item "lhm.zip", "lhm_tmp" -Recurse -Force
+          if (-not (Test-Path "$dest/LibreHardwareMonitor.exe")) {
+            throw "LibreHardwareMonitor.exe not found after extract"
+          }
+          Get-ChildItem $dest | Select-Object -ExpandProperty Name
 
       - name: Install frontend deps
         run: pnpm install --frozen-lockfile
