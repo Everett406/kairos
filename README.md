@@ -16,7 +16,7 @@
 翻译 / 剪贴板 / 音乐 / 番茄钟收进标题栏九宫格，任何应用下 Ctrl+Alt+K 呼出全局命令条。
 不注册、不上云，数据都留在你自己的电脑里。
 
-[![Release](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2FEverett406%2Fkairos%2Freleases&query=%24[0].tag_name&label=release&color=3b6ef5)](https://github.com/Everett406/kairos/releases)
+[![Release](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgitee.com%2Fapi%2Fv5%2Frepos%2FEverett5678%2Fkairos%2Freleases&query=%24[0].tag_name&label=release&color=3b6ef5)](https://gitee.com/Everett5678/kairos/releases)
 ![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-0078D6?style=flat-square&logo=windows11&logoColor=white)
 ![Tauri](https://img.shields.io/badge/Tauri-2-24C8D8?style=flat-square&logo=tauri&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)
@@ -70,7 +70,7 @@
 
 ## 安装
 
-到 [Releases](https://github.com/Everett406/kairos/releases) 下载对应产物：
+到 [Releases](https://gitee.com/Everett5678/kairos/releases) 下载对应产物：
 
 | 产物 | 适合谁 | 用法 |
 | --- | --- | --- |
